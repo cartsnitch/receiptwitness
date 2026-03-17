@@ -33,10 +33,14 @@ export function Register() {
       const res = await api.post<{ user: User; token: string }>('/auth/register', { name, email, password })
       setAuth(res.user, res.token)
       navigate('/')
-    } catch {
-      // Fallback to mock auth for demo
-      setAuth({ ...mockUser, name, email }, 'mock-jwt-token')
-      navigate('/')
+    } catch (err) {
+      if (import.meta.env.VITE_MOCK_AUTH === 'true') {
+        // Fallback to mock auth for demo
+        setAuth({ ...mockUser, name, email }, 'mock-jwt-token')
+        navigate('/')
+      } else {
+        setError('Registration failed. Please try again.')
+      }
     } finally {
       setLoading(false)
     }

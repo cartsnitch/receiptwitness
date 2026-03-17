@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Layout } from './components/Layout.tsx'
+import { ProtectedRoute } from './components/ProtectedRoute.tsx'
 import { Dashboard } from './pages/Dashboard.tsx'
 import { Purchases } from './pages/Purchases.tsx'
 import { PurchaseDetail } from './pages/PurchaseDetail.tsx'
@@ -31,15 +32,17 @@ export default function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />
-            <Route path="purchases" element={<Purchases />} />
-            <Route path="purchases/:id" element={<PurchaseDetail />} />
-            <Route path="products" element={<Products />} />
-            <Route path="products/:id" element={<ProductDetail />} />
-            <Route path="compare/:productId" element={<StoreComparison />} />
-            <Route path="coupons" element={<Coupons />} />
-            <Route path="alerts" element={<Alerts />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="account-linking" element={<AccountLinking />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="purchases" element={<Purchases />} />
+              <Route path="purchases/:id" element={<PurchaseDetail />} />
+              <Route path="products" element={<Products />} />
+              <Route path="products/:id" element={<ProductDetail />} />
+              <Route path="compare/:productId" element={<StoreComparison />} />
+              <Route path="coupons" element={<Coupons />} />
+              <Route path="alerts" element={<Alerts />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="account-linking" element={<AccountLinking />} />
+            </Route>
           </Route>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />

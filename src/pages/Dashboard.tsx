@@ -1,8 +1,12 @@
+import React, { Suspense } from 'react'
 import { Link } from 'react-router-dom'
-import { LineChart, Line, ResponsiveContainer } from 'recharts'
 import { useAuthStore } from '../stores/auth.ts'
 import { mockPurchases, mockAlerts, getMockPriceHistory } from '../lib/mock-data.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
+
+const LazySparklineCard = React.lazy(() =>
+  import('../components/SparklineChart.tsx').then((mod) => ({ default: mod.SparklineCard }))
+)
 
 const sparklineData = getMockPriceHistory('prod10').filter((p) => p.storeId === 'meijer').slice(-8)
 const milkSparkline = getMockPriceHistory('prod1').filter((p) => p.storeId === 'kroger').slice(-8)
@@ -84,8 +88,10 @@ export function Dashboard() {
       <section className="mt-6">
         <h2 className="mb-3 text-lg font-semibold text-gray-700">Price Trends</h2>
         <div className="space-y-3">
-          <SparklineCard label="Eggs (dozen)" data={sparklineData} current="$5.44" />
-          <SparklineCard label="Whole Milk (1 gal)" data={milkSparkline} current="$3.29" />
+          <Suspense fallback={<SparklinePlaceholder />}>
+            <LazySparklineCard label="Eggs (dozen)" data={sparklineData} current="$5.44" />
+            <LazySparklineCard label="Whole Milk (1 gal)" data={milkSparkline} current="$3.29" />
+          </Suspense>
         </div>
       </section>
 
@@ -145,34 +151,14 @@ export function Dashboard() {
   )
 }
 
-function SparklineCard({
-  label,
-  data,
-  current,
-}: {
-  label: string
-  data: { date: string; price: number }[]
-  current: string
-}) {
+function SparklinePlaceholder() {
   return (
-    <div className="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm">
+    <div className="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm animate-pulse">
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-gray-900">{label}</p>
-        <p className="text-lg font-bold text-gray-900">{current}</p>
+        <div className="h-4 w-24 rounded bg-gray-200" />
+        <div className="mt-2 h-6 w-16 rounded bg-gray-200" />
       </div>
-      <div className="h-10 w-24">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-            <Line
-              type="monotone"
-              dataKey="price"
-              stroke="#1e40af"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <div className="h-10 w-24 rounded bg-gray-100" />
     </div>
   )
 }

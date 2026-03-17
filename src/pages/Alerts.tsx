@@ -20,7 +20,7 @@ export function Alerts() {
         <h1 className="text-2xl font-bold text-gray-900">Price Alerts</h1>
         <button
           onClick={() => setShowCreate(!showCreate)}
-          className="min-h-10 rounded-full bg-brand-blue px-4 text-sm font-medium text-white active:bg-brand-blue/90"
+          className="min-h-12 rounded-full bg-brand-blue px-4 text-sm font-medium text-white active:bg-brand-blue/90"
         >
           + New Alert
         </button>

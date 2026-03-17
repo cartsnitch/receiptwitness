@@ -85,7 +85,7 @@ export function Settings() {
               <button
                 key={t}
                 onClick={() => setTheme(t)}
-                className={`min-h-10 flex-1 rounded-lg px-3 py-2 text-sm font-medium capitalize ${
+                className={`min-h-12 flex-1 rounded-lg px-3 py-2 text-sm font-medium capitalize ${
                   theme === t
                     ? 'bg-brand-blue text-white'
                     : 'bg-gray-100 text-gray-700 active:bg-gray-200'
