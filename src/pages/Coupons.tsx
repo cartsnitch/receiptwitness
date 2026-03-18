@@ -2,6 +2,12 @@ import { useState } from 'react'
 import { useCoupons } from '../hooks/useApi.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+
+function isExpiringSoon(expiresAt: string): boolean {
+  return new Date(expiresAt).getTime() - Date.now() < SEVEN_DAYS_MS
+}
+
 export function Coupons() {
   const { data: coupons = [], isLoading, error } = useCoupons()
   const [copied, setCopied] = useState<string | null>(null)
@@ -45,8 +51,7 @@ export function Coupons() {
 
       <div className="mt-4 space-y-3">
         {coupons.map((coupon) => {
-          const isExpiringSoon =
-            new Date(coupon.expiresAt).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000
+          const expiringSoon = isExpiringSoon(coupon.expiresAt)
 
           return (
             <div key={coupon.id} className="rounded-xl bg-white p-4 shadow-sm">
@@ -57,7 +62,7 @@ export function Coupons() {
                   <p className="mt-0.5 text-xs text-gray-500">{coupon.storeName}</p>
                   <p
                     className={`mt-1 text-xs ${
-                      isExpiringSoon ? 'font-medium text-orange-600' : 'text-gray-400'
+                      expiringSoon ? 'font-medium text-orange-600' : 'text-gray-400'
                     }`}
                   >
                     Expires{' '}
@@ -65,7 +70,7 @@ export function Coupons() {
                       month: 'short',
                       day: 'numeric',
                     })}
-                    {isExpiringSoon && ' — expiring soon!'}
+                    {expiringSoon && ' — expiring soon!'}
                   </p>
                 </div>
                 <span className="shrink-0 rounded-lg bg-green-100 px-2 py-1 text-sm font-bold text-green-700">

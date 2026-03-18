@@ -44,7 +44,7 @@ export function AccountLinking() {
   const [connected, setConnected] = useState<string[]>(['meijer', 'kroger'])
   const [status, setStatus] = useState<'idle' | 'connecting' | 'success' | 'error'>('idle')
 
-  function handleConnect(storeId: string, _fields: Record<string, string>) {
+  function handleConnect(storeId: string) {
     setStatus('connecting')
     // Simulate connection — fields will be sent to API when available
     setTimeout(() => {
@@ -119,7 +119,7 @@ export function AccountLinking() {
                 <LinkForm
                   store={store}
                   status={status}
-                  onSubmit={(fields) => handleConnect(store.id, fields)}
+                  onSubmit={() => handleConnect(store.id)}
                   onCancel={() => {
                     setLinking(null)
                     setStatus('idle')
@@ -149,7 +149,7 @@ function LinkForm({
 }: {
   store: StoreConfig
   status: string
-  onSubmit: (fields: Record<string, string>) => void
+  onSubmit: () => void
   onCancel: () => void
 }) {
   const [values, setValues] = useState<Record<string, string>>(() =>
@@ -192,7 +192,7 @@ function LinkForm({
       {status === 'idle' && (
         <div className="flex gap-3">
           <button
-            onClick={() => onSubmit(values)}
+            onClick={onSubmit}
             className="min-h-12 flex-1 rounded-xl bg-brand-blue px-4 py-3 text-base font-medium text-white active:bg-brand-blue/90"
           >
             Connect
