@@ -27,7 +27,7 @@ export function Login() {
       const res = await api.post<{ user: User; token: string }>('/auth/login', { email, password })
       setAuth(res.user, res.token)
       navigate('/')
-    } catch (err) {
+    } catch {
       if (import.meta.env.VITE_MOCK_AUTH === 'true') {
         // Fallback to mock auth for demo
         setAuth(mockUser, 'mock-jwt-token')

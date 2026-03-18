@@ -1,23 +1,21 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { mockProducts } from '../lib/mock-data.ts'
+import { useProducts } from '../hooks/useApi.ts'
 
 export function Products() {
   const [search, setSearch] = useState('')
+  const { data: products = [], isLoading, error } = useProducts(search || undefined)
 
-  const filtered = useMemo(() => {
-    if (!search.trim()) return mockProducts
-    const q = search.toLowerCase()
-    return mockProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q),
-    )
-  }, [search])
-
-  const lowestPrice = (product: typeof mockProducts[0]) =>
+  const lowestPrice = (product: typeof products[0]) =>
     Math.min(...product.prices.map((p) => p.price))
+
+  if (error) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-sm text-red-600">Failed to load products.</p>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -36,12 +34,16 @@ export function Products() {
 
       {/* Product list */}
       <div className="mt-4 space-y-3">
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          [1, 2, 3].map((i) => (
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-gray-200" />
+          ))
+        ) : products.length === 0 ? (
           <div className="rounded-xl bg-white p-6 text-center shadow-sm">
-            <p className="text-sm text-gray-500">No products match "{search}".</p>
+            <p className="text-sm text-gray-500">No products match &ldquo;{search}&rdquo;.</p>
           </div>
         ) : (
-          filtered.map((product) => {
+          products.map((product) => {
             const low = lowestPrice(product)
             const cheapest = product.prices.find((p) => p.price === low)
             return (

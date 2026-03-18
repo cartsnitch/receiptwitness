@@ -8,7 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
-import { mockProducts, getMockPriceHistory } from '../lib/mock-data.ts'
+import { useProduct, usePriceHistory } from '../hooks/useApi.ts'
 
 const storeLineColors: Record<string, string> = {
   meijer: '#e31837',
@@ -18,7 +18,18 @@ const storeLineColors: Record<string, string> = {
 
 export function ProductDetail() {
   const { id } = useParams<{ id: string }>()
-  const product = mockProducts.find((p) => p.id === id)
+  const { data: product, isLoading: productLoading } = useProduct(id ?? '')
+  const { data: history = [], isLoading: historyLoading } = usePriceHistory(id ?? '')
+
+  if (productLoading || historyLoading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-4 w-20 rounded bg-gray-200" />
+        <div className="mt-4 h-8 w-48 rounded bg-gray-200" />
+        <div className="mt-6 h-52 rounded-xl bg-gray-200" />
+      </div>
+    )
+  }
 
   if (!product) {
     return (
@@ -31,7 +42,6 @@ export function ProductDetail() {
     )
   }
 
-  const history = getMockPriceHistory(product.id)
   const lowestPrice = Math.min(...product.prices.map((p) => p.price))
 
   // Reshape history for chart: { date, meijer, kroger, target }

@@ -1,17 +1,47 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { mockAlerts } from '../lib/mock-data.ts'
+import { usePriceAlerts } from '../hooks/useApi.ts'
 import type { PriceAlert } from '../types/api.ts'
 
 export function Alerts() {
-  const [alerts, setAlerts] = useState<PriceAlert[]>(mockAlerts)
+  const { data: fetchedAlerts = [], isLoading, error } = usePriceAlerts()
+  const [localAlerts, setLocalAlerts] = useState<PriceAlert[]>([])
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
   const [showCreate, setShowCreate] = useState(false)
+
+  // Merge fetched + locally created, minus deleted
+  const alerts = [
+    ...localAlerts,
+    ...fetchedAlerts.filter((a) => !deletedIds.has(a.id)),
+  ]
 
   const triggered = alerts.filter((a) => a.triggered)
   const watching = alerts.filter((a) => !a.triggered)
 
   function handleDelete(id: string) {
-    setAlerts((prev) => prev.filter((a) => a.id !== id))
+    setLocalAlerts((prev) => prev.filter((a) => a.id !== id))
+    setDeletedIds((prev) => new Set(prev).add(id))
+  }
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-8 w-32 rounded bg-gray-200" />
+        <div className="mt-6 space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-24 rounded-xl bg-gray-200" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-sm text-red-600">Failed to load price alerts.</p>
+      </div>
+    )
   }
 
   return (
@@ -28,7 +58,7 @@ export function Alerts() {
 
       {/* Create alert form */}
       {showCreate && <CreateAlertForm onClose={() => setShowCreate(false)} onCreated={(a) => {
-        setAlerts((prev) => [a, ...prev])
+        setLocalAlerts((prev) => [a, ...prev])
         setShowCreate(false)
       }} />}
 
@@ -115,7 +145,7 @@ function AlertCard({
           )}
           <button
             onClick={() => onDelete(alert.id)}
-            className="min-h-10 min-w-10 rounded-lg p-2 text-gray-400 active:bg-gray-100"
+            className="min-h-12 min-w-12 rounded-lg p-2 text-gray-400 active:bg-gray-100"
             aria-label="Delete alert"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

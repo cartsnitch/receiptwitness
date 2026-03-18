@@ -1,8 +1,72 @@
 import { useAuthStore } from '../stores/auth.ts'
+import {
+  mockPurchases,
+  mockProducts,
+  mockCoupons,
+  mockAlerts,
+  getMockPriceHistory,
+} from './mock-data.ts'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api/v1'
+const USE_MOCK = import.meta.env.VITE_MOCK_API === 'true'
+
+// Mock response lookup table
+const mockRoutes: Record<string, (path: string) => unknown> = {
+  '/purchases': () => mockPurchases,
+  '/products': () => mockProducts,
+  '/coupons': () => mockCoupons,
+  '/price-alerts': () => mockAlerts,
+}
+
+function matchMockRoute<T>(path: string): T | null {
+  // Exact match
+  if (mockRoutes[path]) return mockRoutes[path](path) as T
+
+  // /purchases/:id
+  const purchaseMatch = path.match(/^\/purchases\/(.+)$/)
+  if (purchaseMatch) {
+    const purchase = mockPurchases.find((p) => p.id === purchaseMatch[1])
+    return (purchase ?? null) as T
+  }
+
+  // /products/:id/price-history
+  const priceHistoryMatch = path.match(/^\/products\/(.+)\/price-history$/)
+  if (priceHistoryMatch) {
+    return getMockPriceHistory(priceHistoryMatch[1]) as T
+  }
+
+  // /products?q=search or /products/:id
+  const productMatch = path.match(/^\/products\/(.+)$/)
+  if (productMatch) {
+    const product = mockProducts.find((p) => p.id === productMatch[1])
+    return (product ?? null) as T
+  }
+
+  const productsSearch = path.match(/^\/products\?q=(.+)$/)
+  if (productsSearch) {
+    const q = decodeURIComponent(productsSearch[1]).toLowerCase()
+    return mockProducts.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q),
+    ) as T
+  }
+
+  return null
+}
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  // Mock interceptor: return mock data without hitting the network
+  if (USE_MOCK && (!options?.method || options.method === 'GET')) {
+    const mockResult = matchMockRoute<T>(path)
+    if (mockResult !== null) {
+      // Simulate network delay for realistic loading states
+      await new Promise((r) => setTimeout(r, 300))
+      return mockResult
+    }
+  }
+
   const token = useAuthStore.getState().token
 
   const res = await fetch(`${API_BASE}${path}`, {

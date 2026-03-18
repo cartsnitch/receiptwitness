@@ -1,10 +1,24 @@
 import { useParams, Link } from 'react-router-dom'
-import { mockProducts } from '../lib/mock-data.ts'
+import { useProduct } from '../hooks/useApi.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
 
 export function StoreComparison() {
   const { productId } = useParams<{ productId: string }>()
-  const product = mockProducts.find((p) => p.id === productId)
+  const { data: product, isLoading } = useProduct(productId ?? '')
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-4 w-20 rounded bg-gray-200" />
+        <div className="mt-4 h-8 w-48 rounded bg-gray-200" />
+        <div className="mt-4 space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 rounded-xl bg-gray-200" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (!product) {
     return (

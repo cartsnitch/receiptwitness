@@ -1,12 +1,26 @@
 import { useParams, Link } from 'react-router-dom'
-import { mockPurchases } from '../lib/mock-data.ts'
+import { usePurchase } from '../hooks/useApi.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
 
 export function PurchaseDetail() {
   const { id } = useParams<{ id: string }>()
-  const purchase = mockPurchases.find((p) => p.id === id)
+  const { data: purchase, isLoading, error } = usePurchase(id ?? '')
 
-  if (!purchase) {
+  if (isLoading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-4 w-24 rounded bg-gray-200" />
+        <div className="mt-4 h-20 rounded-xl bg-gray-200" />
+        <div className="mt-4 space-y-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-12 rounded bg-gray-200" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !purchase) {
     return (
       <div className="py-8 text-center">
         <p className="text-sm text-gray-500">Purchase not found.</p>

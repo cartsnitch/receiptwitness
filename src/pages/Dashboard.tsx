@@ -1,23 +1,16 @@
 import React, { Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth.ts'
-import { mockPurchases, mockAlerts, getMockPriceHistory } from '../lib/mock-data.ts'
+import { usePurchases, usePriceAlerts, usePriceHistory } from '../hooks/useApi.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
 
 const LazySparklineCard = React.lazy(() =>
   import('../components/SparklineChart.tsx').then((mod) => ({ default: mod.SparklineCard }))
 )
 
-const sparklineData = getMockPriceHistory('prod10').filter((p) => p.storeId === 'meijer').slice(-8)
-const milkSparkline = getMockPriceHistory('prod1').filter((p) => p.storeId === 'kroger').slice(-8)
-
 export function Dashboard() {
   const user = useAuthStore((s) => s.user)
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-
-  const triggeredAlerts = mockAlerts.filter((a) => a.triggered)
-  const watchingAlerts = mockAlerts.filter((a) => !a.triggered)
-  const recentPurchases = mockPurchases.slice(0, 3)
 
   if (!isAuthenticated) {
     return (
@@ -42,10 +35,33 @@ export function Dashboard() {
     )
   }
 
+  return <AuthenticatedDashboard userName={user?.name ?? 'there'} />
+}
+
+function AuthenticatedDashboard({ userName }: { userName: string }) {
+  const { data: purchases = [], isLoading: purchasesLoading } = usePurchases()
+  const { data: alerts = [], isLoading: alertsLoading } = usePriceAlerts()
+  const { data: eggHistory = [] } = usePriceHistory('prod10')
+  const { data: milkHistory = [] } = usePriceHistory('prod1')
+
+  const triggeredAlerts = alerts.filter((a) => a.triggered)
+  const watchingAlerts = alerts.filter((a) => !a.triggered)
+  const recentPurchases = purchases.slice(0, 3)
+
+  const sparklineData = eggHistory.filter((p) => p.storeId === 'meijer').slice(-8)
+  const milkSparkline = milkHistory.filter((p) => p.storeId === 'kroger').slice(-8)
+
+  const eggCurrent = sparklineData.length > 0 ? `$${sparklineData[sparklineData.length - 1].price.toFixed(2)}` : '—'
+  const milkCurrent = milkSparkline.length > 0 ? `$${milkSparkline[milkSparkline.length - 1].price.toFixed(2)}` : '—'
+
+  if (purchasesLoading || alertsLoading) {
+    return <DashboardSkeleton />
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900">
-        Hi, {user?.name?.split(' ')[0] ?? 'there'}
+        Hi, {userName.split(' ')[0]}
       </h1>
 
       {/* Triggered alerts banner */}
@@ -89,8 +105,8 @@ export function Dashboard() {
         <h2 className="mb-3 text-lg font-semibold text-gray-700">Price Trends</h2>
         <div className="space-y-3">
           <Suspense fallback={<SparklinePlaceholder />}>
-            <LazySparklineCard label="Eggs (dozen)" data={sparklineData} current="$5.44" />
-            <LazySparklineCard label="Whole Milk (1 gal)" data={milkSparkline} current="$3.29" />
+            <LazySparklineCard label="Eggs (dozen)" data={sparklineData} current={eggCurrent} />
+            <LazySparklineCard label="Whole Milk (1 gal)" data={milkSparkline} current={milkCurrent} />
           </Suspense>
         </div>
       </section>
@@ -147,6 +163,23 @@ export function Dashboard() {
           </Link>
         </div>
       </section>
+    </div>
+  )
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-8 w-40 rounded bg-gray-200" />
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="h-24 rounded-xl bg-gray-200" />
+        <div className="h-24 rounded-xl bg-gray-200" />
+      </div>
+      <div className="mt-6 h-5 w-28 rounded bg-gray-200" />
+      <div className="mt-3 space-y-3">
+        <div className="h-16 rounded-xl bg-gray-200" />
+        <div className="h-16 rounded-xl bg-gray-200" />
+      </div>
     </div>
   )
 }

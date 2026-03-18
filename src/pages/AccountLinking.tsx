@@ -44,9 +44,9 @@ export function AccountLinking() {
   const [connected, setConnected] = useState<string[]>(['meijer', 'kroger'])
   const [status, setStatus] = useState<'idle' | 'connecting' | 'success' | 'error'>('idle')
 
-  function handleConnect(storeId: string) {
+  function handleConnect(storeId: string, _fields: Record<string, string>) {
     setStatus('connecting')
-    // Simulate connection
+    // Simulate connection — fields will be sent to API when available
     setTimeout(() => {
       setConnected((prev) => [...prev, storeId])
       setStatus('success')
@@ -100,7 +100,7 @@ export function AccountLinking() {
               {isConnected && !isLinking && (
                 <button
                   onClick={() => handleDisconnect(store.id)}
-                  className="mt-3 min-h-10 w-full rounded-xl border border-red-200 px-4 py-2 text-sm font-medium text-red-600 active:bg-red-50"
+                  className="mt-3 min-h-12 w-full rounded-xl border border-red-200 px-4 py-2 text-sm font-medium text-red-600 active:bg-red-50"
                 >
                   Disconnect
                 </button>
@@ -119,7 +119,7 @@ export function AccountLinking() {
                 <LinkForm
                   store={store}
                   status={status}
-                  onSubmit={() => handleConnect(store.id)}
+                  onSubmit={(fields) => handleConnect(store.id, fields)}
                   onCancel={() => {
                     setLinking(null)
                     setStatus('idle')
@@ -149,9 +149,13 @@ function LinkForm({
 }: {
   store: StoreConfig
   status: string
-  onSubmit: () => void
+  onSubmit: (fields: Record<string, string>) => void
   onCancel: () => void
 }) {
+  const [values, setValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries(store.fields.map((f) => [f.key, ''])),
+  )
+
   return (
     <div className="mt-3 space-y-3">
       {store.fields.map((field) => (
@@ -159,6 +163,8 @@ function LinkForm({
           key={field.key}
           type={field.type}
           placeholder={field.label}
+          value={values[field.key] ?? ''}
+          onChange={(e) => setValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
           autoComplete={field.type === 'password' ? 'current-password' : field.type}
           className="min-h-12 w-full rounded-xl border border-gray-200 px-4 text-base focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue"
         />
@@ -186,7 +192,7 @@ function LinkForm({
       {status === 'idle' && (
         <div className="flex gap-3">
           <button
-            onClick={onSubmit}
+            onClick={() => onSubmit(values)}
             className="min-h-12 flex-1 rounded-xl bg-brand-blue px-4 py-3 text-base font-medium text-white active:bg-brand-blue/90"
           >
             Connect

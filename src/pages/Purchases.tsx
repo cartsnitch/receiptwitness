@@ -1,17 +1,47 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { mockPurchases } from '../lib/mock-data.ts'
+import { usePurchases } from '../hooks/useApi.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
 
-const stores = ['all', ...new Set(mockPurchases.map((p) => p.storeName))]
-
 export function Purchases() {
+  const { data: purchases = [], isLoading, error } = usePurchases()
   const [storeFilter, setStoreFilter] = useState('all')
+
+  const stores = useMemo(
+    () => ['all', ...new Set(purchases.map((p) => p.storeName))],
+    [purchases],
+  )
 
   const filtered =
     storeFilter === 'all'
-      ? mockPurchases
-      : mockPurchases.filter((p) => p.storeName === storeFilter)
+      ? purchases
+      : purchases.filter((p) => p.storeName === storeFilter)
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-8 w-48 rounded bg-gray-200" />
+        <div className="mt-4 flex gap-2">
+          <div className="h-10 w-24 rounded-full bg-gray-200" />
+          <div className="h-10 w-20 rounded-full bg-gray-200" />
+          <div className="h-10 w-20 rounded-full bg-gray-200" />
+        </div>
+        <div className="mt-4 space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-24 rounded-xl bg-gray-200" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-sm text-red-600">Failed to load purchases.</p>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -23,7 +53,7 @@ export function Purchases() {
           <button
             key={store}
             onClick={() => setStoreFilter(store)}
-            className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-medium ${
+            className={`min-h-12 shrink-0 rounded-full px-4 text-sm font-medium ${
               storeFilter === store
                 ? 'bg-brand-blue text-white'
                 : 'bg-white text-gray-700 shadow-sm'
