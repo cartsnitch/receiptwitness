@@ -20,7 +20,7 @@ env:
 
 jobs:
   lint:
-    runs-on: cartsnitch-runners
+    runs-on: runners-cartsnitch
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,7 +34,7 @@ jobs:
         run: npx tsc --noEmit
 
   test:
-    runs-on: cartsnitch-runners
+    runs-on: runners-cartsnitch
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -46,7 +46,7 @@ jobs:
         run: npx vitest run
 
   build-and-push:
-    runs-on: cartsnitch-runners
+    runs-on: runners-cartsnitch
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
