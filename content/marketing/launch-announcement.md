@@ -1,7 +1,7 @@
 ---
 title: "CartSnitch Launch Announcement — Press Release / Blog Post"
 status: draft
-last_updated: 2026-03-18
+last_updated: 2026-03-21
 description: "Launch announcement template for press release distribution and blog publication. Dual-format: blog version and press release version."
 ---
 
@@ -15,7 +15,7 @@ description: "Launch announcement template for press release distribution and bl
 
 Your grocery bill went up 25% since 2020. But the sticker price only tells half the story.
 
-Over the past year, we tracked 10,000+ grocery products across 12 retail chains. We found 847 products that shrank — same price, less product. That's a hidden 10-15% price increase that doesn't appear in any inflation statistic. Your receipt doesn't show it. Your store's app doesn't flag it. Nobody tells you.
+Over the past year, we tracked 10,000+ grocery products across 12 retail chains. We found hundreds of products that shrank — same price, less product. That's a hidden 10-15% price increase that doesn't appear in any inflation statistic. Your receipt doesn't show it. Your store's app doesn't flag it. Nobody tells you.
 
 Today, we're changing that. **CartSnitch is now available for early access.**
 
@@ -43,8 +43,8 @@ CartSnitch gives consumers the same price intelligence that retailers have alway
 
 - **$14,000** — What the average US family spends on groceries annually
 - **25%** — Grocery price increase since January 2020
-- **847** — Products in our database that shrank in the past 12 months
-- **$336/year** — Potential savings from buying the same items at the cheapest store
+- **Hundreds** — Products in our database flagged for shrinkflation
+- **Real savings** — Buy the same items at the cheapest store and save on your grocery bill
 
 #### Get started
 
@@ -66,7 +66,7 @@ CartSnitch is launching with Meijer support in Southeast Michigan. Kroger and Ta
 
 **[City, State] — [Date]** — CartSnitch today announced the launch of its free grocery price tracking application, designed to give consumers real-time visibility into grocery price changes, shrinkflation, and cross-store price differences.
 
-The tool connects to shoppers' existing store loyalty accounts to automatically track prices for every product purchased. CartSnitch's analysis of over 10,000 products across 12 retail chains found that 847 products experienced shrinkflation — reduced package sizes at the same or higher prices — in the past 12 months, representing a hidden 10-15% cost increase invisible to consumers.
+The tool connects to shoppers' existing store loyalty accounts to automatically track prices for every product purchased. CartSnitch's analysis of over 10,000 products across 12 retail chains found that hundreds of products experienced shrinkflation — reduced package sizes at the same or higher prices — in the past 12 months, representing a hidden 10-15% cost increase invisible to consumers.
 
 "Grocery prices have increased 25% since 2020, but the real cost to families is even higher when you account for shrinkflation," said [spokesperson]. "CartSnitch exists to close the information gap between retailers and consumers. The same data that helps stores optimize pricing should be available to the people paying those prices."
 
@@ -78,7 +78,7 @@ The tool connects to shoppers' existing store loyalty accounts to automatically 
 - **Price drop alerts** with user-defined target pricing
 - **Complete purchase history** with search and trend analysis
 
-CartSnitch estimates that families who use cross-store price comparison for common items can save an average of $336 per year. Combined with shrinkflation awareness and price-timing optimization, total savings potential ranges from $500-$1,400 annually.
+Families who use cross-store price comparison for common items can save meaningfully on their grocery bills each year. Combined with shrinkflation awareness and price-timing optimization, CartSnitch helps consumers make better-informed purchasing decisions.
 
 The application launches with Meijer integration in Southeast Michigan, with Kroger and Target support expected within weeks. Additional retailers including Walmart, Costco, and Aldi are on the development roadmap.
 
