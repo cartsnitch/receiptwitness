@@ -46,7 +46,7 @@ Brands know unit price is how smart shoppers compare. Instead of raising shelf p
 - 2021: Cereal box — 18 oz at $4.99 → $0.277/oz
 - 2024: Same brand, same shelf price — 15.5 oz at $4.99 → $0.322/oz
 
-The shelf price did not change. The unit price went up 16.2%. You are paying 16% more per ounce for the same product without realizing it.
+The shelf price did not change. The unit price went up 16.1%. You are paying 16.1% more per ounce for the same product without realizing it.
 
 This is shrinkflation, and it is happening across cereals, snacks, dairy, household products, and more.
 
