@@ -102,6 +102,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           target: prod
+          no-cache: true
 
       - name: Create git tag
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
