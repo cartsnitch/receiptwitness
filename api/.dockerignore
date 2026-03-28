@@ -1,0 +1,14 @@
+.git
+.github
+.pytest_cache
+.ruff_cache
+__pycache__
+*.py[cod]
+*.egg-info
+dist
+.venv
+.env
+tests
+openapi.json
+CLAUDE.md
+README.md
