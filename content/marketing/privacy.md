@@ -8,7 +8,7 @@ Here's exactly what we access, what we store, and what we never do.
 
 ## What We Access
 
-When you connect your store account, we use a read-only connection to your loyalty program data. This means we can see:
+When you connect your store account, CartSnitch uses an automated scraper to pull your purchase history from the store loyalty portal. This means we can see:
 
 - **What you bought** — product names and quantities
 - **How much you paid** — shelf prices at time of purchase
@@ -40,7 +40,7 @@ We **do not store**:
 ## What We Never Do
 
 - **We never sell your data.** Your data is never a product. We don't license it, share it with third parties, or use it for advertising.
-- **We never see your login credentials.** We use a read-only connection to your store loyalty account — we never have access to your store password.
+- **We never see your login credentials.** CartSnitch accesses your store loyalty portal through an automated scraper — we never have access to your store password.
 - **We never post to your social accounts or profile.**
 - **We never use your purchase data for anything other than the CartSnitch service.**
 
@@ -70,7 +70,7 @@ That's it.
 ## Security
 
 - All data is encrypted in transit and at rest
-- We use read-only connections to store loyalty accounts — we never see your store password
+- CartSnitch accesses store loyalty portals using an automated scraper — we never see your store password
 - Our team follows strict access controls — only the engineers who need your data to build the product can access it
 
 ---

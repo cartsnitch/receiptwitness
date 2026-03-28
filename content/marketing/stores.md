@@ -18,7 +18,7 @@ We're actively expanding coverage. If your store isn't listed, you can request i
 
 **Supported regions:** Midwest (Meijer and Meijer Express)
 
-**Note:** Connect your Meijer account through our secure loyalty program integration.
+**Note:** Connect your Meijer account and CartSnitch will pull your purchase history from the Meijer loyalty portal using an automated scraper.
 
 ---
 
@@ -32,7 +32,7 @@ We're actively expanding coverage. If your store isn't listed, you can request i
 
 **Supported regions:** Nationwide (Kroger, Kroger Marketplace, Kroger Pickup)
 
-**Note:** Connect your Kroger account through our secure loyalty program integration.
+**Note:** Connect your Kroger account and CartSnitch will pull your purchase history from the Kroger loyalty portal using an automated scraper.
 
 ---
 
@@ -46,7 +46,7 @@ We're actively expanding coverage. If your store isn't listed, you can request i
 
 **Supported regions:** Nationwide
 
-**Note:** Connect your Target account through our secure loyalty program integration.
+**Note:** Connect your Target account and CartSnitch will pull your purchase history from the Target loyalty portal using an automated scraper.
 
 ---
 

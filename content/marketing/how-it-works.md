@@ -15,9 +15,9 @@ CartSnitch tracks unit prices automatically — so you don't have to do the math
 ## How We Track Prices
 
 CartSnitch pulls pricing data from:
-- **Store loyalty accounts** — Meijer, Kroger, and Target — when you connect your account
+- **Store loyalty portals** — Meijer, Kroger, and Target — when you connect your account, CartSnitch uses an automated scraper to pull your purchase history from the store loyalty portal
 - **Public manufacturer data** — packaging changes, suggested retail prices
-- **USDA FoodData Central** — reference data for package sizing baselines
+- **USDA FoodData Central** — reference data for package sizing baselines (used for historical size comparison only — not part of our live tracking system)
 
 We calculate unit price for every product we track:
 
@@ -63,7 +63,7 @@ This is different from just comparing the price of one item. Some stores are che
 
 ## What We Don't Do
 
-- **We don't collect receipts** — Store account connections give us enough data to track prices and compare baskets
+- **We don't collect receipts** — Store account connections give us enough data to track prices and compare baskets. Receipt-based tracking is being evaluated.
 - **We don't have every product** — Beta is limited to supported stores and categories. We're adding more every week.
 - **We don't affect shelf prices** — We show you the data. What you do with it is up to you.
 
