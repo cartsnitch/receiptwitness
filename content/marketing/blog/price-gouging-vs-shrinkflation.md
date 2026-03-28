@@ -35,7 +35,7 @@ Shrinkflation is **legal** in the US. Manufacturers are required to disclose net
 
 ## How CartSnitch Handles Both
 
-**CartSnitch tracks shrinkflation automatically.** We monitor unit prices across thousands of products and alert you when a product you buy regularly gets smaller or more expensive.
+**CartSnitch tracks shrinkflation automatically.** We monitor unit prices across our tracked products and alert you when a product you buy regularly gets smaller or more expensive.
 
 **Price gouging is different.** CartSnitch does not currently detect price gouging — it requires monitoring retail prices during specific time periods and comparing against pre-crisis baselines, which is outside our current scope.
 
