@@ -15,7 +15,7 @@ CartSnitch is a grocery price tracking and shrinkflation detection app that help
 
 ## Product Description
 
-CartSnitch tracks unit prices (price ÷ size) across thousands of grocery products. Users can:
+CartSnitch tracks unit prices (price ÷ size) across grocery products. Users can:
 - Set alerts on products they buy regularly
 - See when a product gets smaller or more expensive
 - Compare total grocery costs across stores
@@ -47,7 +47,7 @@ Unlike price gouging, which is illegal during emergencies in many states, shrink
 
 2. **Shrinkflation is real and costly.** Brands reduce product sizes while maintaining or raising prices. The average family loses $300–$500/year.
 
-3. **CartSnitch tracks it automatically.** We monitor unit prices across thousands of products and alert users when their regular purchases change.
+3. **CartSnitch tracks it automatically.** We monitor unit prices across products and alert users when their regular purchases change.
 
 4. **Consumers deserve transparency.** Price-per-unit should be displayed prominently at shelf level. Until regulation catches up, CartSnitch gives consumers the data directly.
 
