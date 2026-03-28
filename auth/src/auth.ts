@@ -1,0 +1,85 @@
+import { betterAuth } from "better-auth";
+import bcrypt from "bcrypt";
+import pg from "pg";
+
+const { Pool } = pg;
+
+const pool = new Pool({
+  connectionString:
+    process.env.DATABASE_URL ??
+    "postgresql://cartsnitch:cartsnitch@localhost:5432/cartsnitch",
+});
+
+export const auth = betterAuth({
+  database: pool,
+  basePath: "/auth",
+  secret: process.env.BETTER_AUTH_SECRET ?? "change-me-in-production-min-32-chars!!",
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3001",
+
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    password: {
+      hash: async (password: string) => {
+        return bcrypt.hash(password, 10);
+      },
+      verify: async (data: { hash: string; password: string }) => {
+        return bcrypt.compare(data.password, data.hash);
+      },
+    },
+  },
+
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // refresh after 1 day
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5-minute cookie cache
+    },
+  },
+
+  user: {
+    modelName: "users",
+    fields: {
+      name: "display_name",
+      emailVerified: "email_verified",
+      image: "image",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  },
+
+  account: {
+    modelName: "accounts",
+    fields: {
+      userId: "user_id",
+      accountId: "account_id",
+      providerId: "provider_id",
+      accessToken: "access_token",
+      refreshToken: "refresh_token",
+      accessTokenExpiresAt: "access_token_expires_at",
+      refreshTokenExpiresAt: "refresh_token_expires_at",
+      idToken: "id_token",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  },
+
+  verification: {
+    modelName: "verifications",
+    fields: {
+      expiresAt: "expires_at",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  },
+
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://cartsnitch.com",
+    "https://cartsnitch.farh.net",
+    "https://cartsnitch.dev.farh.net",
+  ],
+});

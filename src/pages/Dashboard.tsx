@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuthStore } from '../stores/auth.ts'
+import { authClient } from '../lib/auth-client.ts'
 import { usePurchases, usePriceAlerts, usePriceHistory } from '../hooks/useApi.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
 
@@ -9,10 +9,13 @@ const LazySparklineCard = React.lazy(() =>
 )
 
 export function Dashboard() {
-  const user = useAuthStore((s) => s.user)
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const { data: session, isPending } = authClient.useSession()
 
-  if (!isAuthenticated) {
+  if (isPending) {
+    return <DashboardSkeleton />
+  }
+
+  if (!session) {
     return (
       <div className="py-8 text-center">
         <h1 className="text-2xl font-bold text-gray-900">CartSnitch</h1>
@@ -35,7 +38,7 @@ export function Dashboard() {
     )
   }
 
-  return <AuthenticatedDashboard userName={user?.name ?? 'there'} />
+  return <AuthenticatedDashboard userName={session.user?.name ?? 'there'} />
 }
 
 function AuthenticatedDashboard({ userName }: { userName: string }) {

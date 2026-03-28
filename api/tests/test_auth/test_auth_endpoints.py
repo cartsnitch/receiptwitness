@@ -1,144 +1,11 @@
-"""Integration tests for auth endpoints."""
+"""Integration tests for auth profile endpoints.
+
+Registration, login, and session management are handled by the Better-Auth
+service. These tests cover the profile endpoints (GET/PATCH/DELETE /auth/me)
+which validate sessions via the shared sessions table.
+"""
 
 import pytest
-
-
-@pytest.mark.asyncio
-async def test_register_success(client):
-    resp = await client.post(
-        "/auth/register",
-        json={
-            "email": "new@example.com",
-            "password": "securepass123",
-            "display_name": "New User",
-        },
-    )
-    assert resp.status_code == 201
-    data = resp.json()
-    assert "access_token" in data
-    assert "refresh_token" in data
-    assert data["token_type"] == "bearer"
-    assert data["expires_in"] == 900  # 15 min * 60
-
-
-@pytest.mark.asyncio
-async def test_register_duplicate_email(client):
-    await client.post(
-        "/auth/register",
-        json={
-            "email": "dupe@example.com",
-            "password": "securepass123",
-            "display_name": "User One",
-        },
-    )
-    resp = await client.post(
-        "/auth/register",
-        json={
-            "email": "dupe@example.com",
-            "password": "securepass456",
-            "display_name": "User Two",
-        },
-    )
-    assert resp.status_code == 409
-
-
-@pytest.mark.asyncio
-async def test_register_short_password(client):
-    resp = await client.post(
-        "/auth/register",
-        json={
-            "email": "short@example.com",
-            "password": "short",
-            "display_name": "Short Pass",
-        },
-    )
-    assert resp.status_code == 422
-
-
-@pytest.mark.asyncio
-async def test_login_success(client):
-    await client.post(
-        "/auth/register",
-        json={
-            "email": "login@example.com",
-            "password": "securepass123",
-            "display_name": "Login User",
-        },
-    )
-    resp = await client.post(
-        "/auth/login",
-        json={
-            "email": "login@example.com",
-            "password": "securepass123",
-        },
-    )
-    assert resp.status_code == 200
-    assert "access_token" in resp.json()
-
-
-@pytest.mark.asyncio
-async def test_login_wrong_password(client):
-    await client.post(
-        "/auth/register",
-        json={
-            "email": "wrong@example.com",
-            "password": "securepass123",
-            "display_name": "Wrong Pass",
-        },
-    )
-    resp = await client.post(
-        "/auth/login",
-        json={
-            "email": "wrong@example.com",
-            "password": "badpassword1",
-        },
-    )
-    assert resp.status_code == 401
-
-
-@pytest.mark.asyncio
-async def test_login_nonexistent_user(client):
-    resp = await client.post(
-        "/auth/login",
-        json={
-            "email": "ghost@example.com",
-            "password": "doesntmatter",
-        },
-    )
-    assert resp.status_code == 401
-
-
-@pytest.mark.asyncio
-async def test_refresh_token(client):
-    reg = await client.post(
-        "/auth/register",
-        json={
-            "email": "refresh@example.com",
-            "password": "securepass123",
-            "display_name": "Refresh User",
-        },
-    )
-    refresh_token = reg.json()["refresh_token"]
-
-    resp = await client.post(
-        "/auth/refresh",
-        json={
-            "refresh_token": refresh_token,
-        },
-    )
-    assert resp.status_code == 200
-    assert "access_token" in resp.json()
-
-
-@pytest.mark.asyncio
-async def test_refresh_with_invalid_token(client):
-    resp = await client.post(
-        "/auth/refresh",
-        json={
-            "refresh_token": "invalid.token.here",
-        },
-    )
-    assert resp.status_code == 401
 
 
 @pytest.mark.asyncio
@@ -155,7 +22,32 @@ async def test_get_me(client, auth_headers):
 @pytest.mark.asyncio
 async def test_get_me_unauthorized(client):
     resp = await client.get("/auth/me")
-    assert resp.status_code in (401, 403)  # No auth header
+    assert resp.status_code in (401, 403)
+
+
+@pytest.mark.asyncio
+async def test_get_me_invalid_session(client):
+    resp = await client.get(
+        "/auth/me",
+        headers={"Cookie": "better-auth.session_token=invalid-token"},
+    )
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_me_with_bearer_token(client, db_engine):
+    """Session tokens can also be passed as Bearer tokens for API clients."""
+    from tests.conftest import _create_test_user_and_session
+
+    _, session_token = await _create_test_user_and_session(
+        client, db_engine, email="bearer@example.com", display_name="Bearer User"
+    )
+    resp = await client.get(
+        "/auth/me",
+        headers={"Authorization": f"Bearer {session_token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["email"] == "bearer@example.com"
 
 
 @pytest.mark.asyncio
@@ -163,9 +55,7 @@ async def test_update_me(client, auth_headers):
     resp = await client.patch(
         "/auth/me",
         headers=auth_headers,
-        json={
-            "display_name": "Updated Name",
-        },
+        json={"display_name": "Updated Name"},
     )
     assert resp.status_code == 200
     assert resp.json()["display_name"] == "Updated Name"
@@ -176,34 +66,58 @@ async def test_delete_me(client, auth_headers):
     resp = await client.delete("/auth/me", headers=auth_headers)
     assert resp.status_code == 204
 
-    # Verify user is gone (token still valid but user deleted)
+    # Session is still valid but user is gone
     resp = await client.get("/auth/me", headers=auth_headers)
     assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_refresh_after_delete_fails(client):
-    """Refresh token for a deleted user must be rejected."""
-    reg = await client.post(
-        "/auth/register",
-        json={
-            "email": "ghost@example.com",
-            "password": "securepass123",
-            "display_name": "Ghost User",
-        },
-    )
-    tokens = reg.json()
-    headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+async def test_expired_session_rejected(client, db_engine):
+    """Expired sessions must be rejected."""
+    import secrets
+    import uuid
+    from datetime import UTC, datetime, timedelta
 
-    # Delete the user
-    resp = await client.delete("/auth/me", headers=headers)
-    assert resp.status_code == 204
+    from sqlalchemy import text
 
-    # Refresh token should now fail
-    resp = await client.post(
-        "/auth/refresh",
-        json={
-            "refresh_token": tokens["refresh_token"],
-        },
+    user_id = str(uuid.uuid4())
+    session_token = secrets.token_urlsafe(32)
+    now = datetime.now(UTC).isoformat()
+    expired = (datetime.now(UTC) - timedelta(hours=1)).isoformat()
+
+    async with db_engine.begin() as conn:
+        await conn.execute(
+            text(
+                "INSERT INTO users (id, email, hashed_password, display_name, email_verified, created_at, updated_at) "
+                "VALUES (:id, :email, :hp, :dn, :ev, :ca, :ua)"
+            ),
+            {
+                "id": user_id,
+                "email": "expired@example.com",
+                "hp": "unused",
+                "dn": "Expired User",
+                "ev": False,
+                "ca": now,
+                "ua": now,
+            },
+        )
+        await conn.execute(
+            text(
+                "INSERT INTO sessions (id, token, user_id, expires_at, created_at, updated_at) "
+                "VALUES (:id, :token, :uid, :ea, :ca, :ua)"
+            ),
+            {
+                "id": str(uuid.uuid4()),
+                "token": session_token,
+                "uid": user_id,
+                "ea": expired,
+                "ca": now,
+                "ua": now,
+            },
+        )
+
+    resp = await client.get(
+        "/auth/me",
+        headers={"Cookie": f"better-auth.session_token={session_token}"},
     )
     assert resp.status_code == 401

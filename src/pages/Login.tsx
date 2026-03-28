@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { authClient } from '../lib/auth-client.ts'
 import { useAuthStore } from '../stores/auth.ts'
-import { api } from '../lib/api.ts'
-import { mockUser } from '../lib/mock-data.ts'
-import type { User } from '../types/api.ts'
 
 export function Login() {
   const [email, setEmail] = useState('')
@@ -11,7 +9,7 @@ export function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const setAuth = useAuthStore((s) => s.setAuth)
+  const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -24,13 +22,20 @@ export function Login() {
 
     setLoading(true)
     try {
-      const res = await api.post<{ user: User; token: string }>('/auth/login', { email, password })
-      setAuth(res.user, res.token)
+      const { data, error: authError } = await authClient.signIn.email({
+        email,
+        password,
+      })
+
+      if (authError) {
+        throw new Error(authError.message ?? 'Sign in failed')
+      }
+
+      setAuthenticated(true)
       navigate('/')
     } catch {
       if (import.meta.env.VITE_MOCK_AUTH === 'true') {
-        // Fallback to mock auth for demo
-        setAuth(mockUser, 'mock-jwt-token')
+        setAuthenticated(true)
         navigate('/')
       } else {
         setError('Invalid email or password. Please try again.')
