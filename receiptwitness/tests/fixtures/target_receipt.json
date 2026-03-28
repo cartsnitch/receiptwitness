@@ -1,0 +1,140 @@
+{
+  "orderId": "TGT-2026-0315-7890",
+  "purchaseDate": "2026-03-15T11:23:00Z",
+  "storeNumber": "2774",
+  "total": 83.21,
+  "savings": 11.45,
+  "detail": {
+    "receiptId": "TGT-2026-0315-7890",
+    "items": [
+      {
+        "description": "GOOD & GATHER WHOLE MILK GAL",
+        "tcin": "14767459",
+        "upc": "0085239100123",
+        "quantity": 1,
+        "unitPrice": 3.89,
+        "totalPrice": 3.89,
+        "regularPrice": 4.19,
+        "circlePrice": 3.89,
+        "couponDiscount": 0.0,
+        "circleRewardsDiscount": 0.30,
+        "promoDescription": "Circle offer: Save 30c",
+        "department": "GROCERY"
+      },
+      {
+        "description": "BANANAS",
+        "upc": "0000000004011",
+        "quantity": 1,
+        "unitPrice": 0.25,
+        "totalPrice": 0.25,
+        "regularPrice": 0.25,
+        "circlePrice": null,
+        "couponDiscount": null,
+        "circleRewardsDiscount": null,
+        "department": "PRODUCE"
+      },
+      {
+        "description": "MARKET PANTRY LARGE EGGS 18CT",
+        "tcin": "13292174",
+        "upc": "0085239206753",
+        "quantity": 2,
+        "unitPrice": 4.99,
+        "totalPrice": 9.98,
+        "regularPrice": 5.49,
+        "circlePrice": 4.99,
+        "couponDiscount": 0.0,
+        "circleRewardsDiscount": 1.00,
+        "promoDescription": "Circle offer: 2 for $10",
+        "department": "GROCERY"
+      },
+      {
+        "description": "DELI SLICED TURKEY BREAST",
+        "upc": null,
+        "quantity": 0.72,
+        "unitPrice": 10.99,
+        "totalPrice": 7.91,
+        "regularPrice": 10.99,
+        "weight": 0.72,
+        "weightUom": "LB",
+        "department": "DELI"
+      },
+      {
+        "description": "TIDE PODS 42CT",
+        "tcin": "76150253",
+        "upc": "0003700096223",
+        "quantity": 1,
+        "unitPrice": 13.49,
+        "totalPrice": 13.49,
+        "regularPrice": 15.99,
+        "circlePrice": 13.49,
+        "couponDiscount": 2.50,
+        "circleRewardsDiscount": 0.0,
+        "promoDescription": "Circle offer + mfr coupon",
+        "department": "HOUSEHOLD"
+      },
+      {
+        "description": "UP&UP PAPER TOWELS 6PK",
+        "tcin": "52493117",
+        "upc": "0085239401567",
+        "quantity": 1,
+        "unitPrice": 8.99,
+        "totalPrice": 8.99,
+        "regularPrice": 8.99,
+        "circlePrice": null,
+        "couponDiscount": null,
+        "circleRewardsDiscount": null,
+        "department": "HOUSEHOLD"
+      },
+      {
+        "description": "VOIDED COCA-COLA 12PK",
+        "upc": "0004900002521",
+        "quantity": 1,
+        "unitPrice": 7.49,
+        "totalPrice": 7.49,
+        "voided": true,
+        "department": "BEVERAGES"
+      },
+      {
+        "description": "RETURNED OLAY MOISTURIZER",
+        "upc": "0007560402118",
+        "quantity": 1,
+        "unitPrice": 12.99,
+        "totalPrice": 12.99,
+        "status": "RETURNED",
+        "department": "BEAUTY"
+      },
+      {
+        "description": "FAVOURITE DAY TRAIL MIX",
+        "tcin": "83921045",
+        "dpci": "271-09-0142",
+        "upc": "0085239700891",
+        "quantity": 1,
+        "unitPrice": 5.49,
+        "totalPrice": 5.49,
+        "regularPrice": 5.49,
+        "circlePrice": null,
+        "couponDiscount": null,
+        "circleRewardsDiscount": null,
+        "department": "SNACKS"
+      },
+      {
+        "description": "BOGO GOOD & GATHER PASTA",
+        "tcin": "78114326",
+        "upc": "0085239300456",
+        "quantity": 2,
+        "unitPrice": 1.79,
+        "totalPrice": 1.79,
+        "regularPrice": 1.79,
+        "circlePrice": 0.895,
+        "couponDiscount": 0.0,
+        "circleRewardsDiscount": 1.79,
+        "promoDescription": "Buy 1 get 1 free",
+        "department": "GROCERY"
+      }
+    ],
+    "subtotal": 78.32,
+    "tax": 4.89,
+    "total": 83.21,
+    "totalSavings": 11.45
+  }
+}

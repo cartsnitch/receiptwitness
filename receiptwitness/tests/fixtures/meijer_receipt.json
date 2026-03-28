@@ -1,0 +1,85 @@
+{
+  "transactionId": "TXN-2026-0310-001",
+  "transactionDate": "2026-03-10T14:30:00Z",
+  "storeNumber": "42",
+  "total": 87.42,
+  "savings": 12.50,
+  "detail": {
+    "receiptId": "TXN-2026-0310-001",
+    "items": [
+      {
+        "description": "ORGANIC BANANAS",
+        "upc": "0000000004011",
+        "quantity": 1,
+        "price": 0.69,
+        "extendedPrice": 0.69,
+        "regularPrice": 0.79,
+        "salePrice": 0.69,
+        "couponDiscount": 0.0,
+        "mperksDiscount": 0.10,
+        "category": "PRODUCE"
+      },
+      {
+        "description": "MEIJER 2% MILK GAL",
+        "upc": "0041250000123",
+        "quantity": 2,
+        "price": 3.49,
+        "extendedPrice": 6.98,
+        "regularPrice": 3.79,
+        "salePrice": 3.49,
+        "couponDiscount": 0.0,
+        "mperksDiscount": 0.0,
+        "category": "DAIRY"
+      },
+      {
+        "description": "CHEERIOS 18OZ",
+        "upc": "0016000275614",
+        "quantity": 1,
+        "price": 4.99,
+        "extendedPrice": 4.99,
+        "regularPrice": 5.49,
+        "salePrice": null,
+        "couponDiscount": 0.50,
+        "mperksDiscount": 0.0,
+        "category": "CEREAL"
+      },
+      {
+        "description": "WEIGHTED DELI TURKEY",
+        "upc": null,
+        "quantity": 0.75,
+        "price": 8.99,
+        "extendedPrice": 6.74,
+        "regularPrice": 8.99,
+        "salePrice": null,
+        "couponDiscount": null,
+        "mperksDiscount": null,
+        "category": "DELI"
+      },
+      {
+        "description": "VOIDED SODA 12PK",
+        "upc": "0004900005678",
+        "quantity": 1,
+        "price": 5.99,
+        "extendedPrice": 5.99,
+        "voided": true,
+        "category": "BEVERAGES"
+      },
+      {
+        "description": "MEIJER PAPER TOWELS 6PK",
+        "upc": "0041250099001",
+        "quantity": 1,
+        "price": 7.99,
+        "extendedPrice": 7.99,
+        "regularPrice": 9.99,
+        "salePrice": 7.99,
+        "couponDiscount": 1.00,
+        "mperksDiscount": 1.00,
+        "category": "HOUSEHOLD"
+      }
+    ],
+    "subtotal": 74.92,
+    "tax": 5.24,
+    "total": 87.42,
+    "totalSavings": 12.50
+  }
+}
