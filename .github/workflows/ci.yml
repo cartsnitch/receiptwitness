@@ -48,6 +48,8 @@ jobs:
   build-and-push:
     runs-on: runners-cartsnitch
     needs: [lint, test]
+    outputs:
+      calver_tag: ${{ steps.calver.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -104,3 +106,52 @@ jobs:
         run: |
           git tag "v${{ steps.calver.outputs.version }}"
           git push origin "v${{ steps.calver.outputs.version }}"
+
+  deploy-dev:
+    runs-on: runners-cartsnitch
+    needs: [build-and-push]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.CARTSNITCH_APP_ID }}
+          private-key: ${{ secrets.CARTSNITCH_APP_PRIVATE_KEY }}
+
+      - name: Checkout infra repo
+        uses: actions/checkout@v4
+        with:
+          repository: cartsnitch/infra
+          token: ${{ steps.app-token.outputs.token }}
+          ref: main
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Update dev overlay image tag
+        working-directory: apps/overlays/dev
+        run: |
+          kustomize edit set image ghcr.io/cartsnitch/cartsnitch:${{ needs.build-and-push.outputs.calver_tag }}
+
+      - name: Commit and push to infra
+        run: |
+          cd apps/overlays/dev
+          git config user.name "cartsnitch-ci[bot]"
+          git config user.email "cartsnitch-ci[bot]@users.noreply.github.com"
+          git add kustomization.yaml
+          git commit -m "ci(dev): update cartsnitch image to ${{ needs.build-and-push.outputs.calver_tag }}"
+          git push origin main
+
+  trigger-uat:
+    runs-on: runners-cartsnitch
+    needs: [deploy-dev, build-and-push]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Create UAT issue in Paperclip
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.PAPERCLIP_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.PAPERCLIP_API_URL }}/api/companies/${{ secrets.PAPERCLIP_COMPANY_ID }}/issues" \
+            -d "{\"title\":\"UAT: cartsnitch ${{ needs.build-and-push.outputs.calver_tag }} deployed to dev\",\"description\":\"## UAT Required\\\\n\\\\nService: cartsnitch (frontend)\\\\nImage: ghcr.io/cartsnitch/cartsnitch:${{ needs.build-and-push.outputs.calver_tag }}\\\\nCommit: ${{ github.sha }}\\\\nWorkflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\\\\n\\\\nPlease run full regression against cartsnitch.dev.farh.net\",\"status\":\"todo\",\"priority\":\"high\",\"assigneeAgentId\":\"1fc33bd9-308c-4abf-a355-87d12b6b0064\",\"projectId\":\"05f7827d-54df-4ff8-9b27-293ffba6e049\"}"
