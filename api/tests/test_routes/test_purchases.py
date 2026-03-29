@@ -1,26 +1,25 @@
 """Integration tests for purchase endpoints."""
 
+import secrets
 import uuid
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 import pytest
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from cartsnitch_api.auth.jwt import create_access_token
 from cartsnitch_api.models import Purchase, PurchaseItem, Store, User
 
 
 @pytest.fixture
 async def purchase_data(db_engine):
-    """Seed a user, store, purchase, and items."""
+    """Seed a user, store, purchase, items, and a valid session."""
     factory = async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
     async with factory() as session:
-        from cartsnitch_api.auth.passwords import hash_password
-
         user = User(
             email="buyer@example.com",
-            hashed_password=hash_password("testpass123"),
+            hashed_password="not-used-with-better-auth",
             display_name="Buyer",
         )
         store = Store(name="Kroger", slug="kroger")
@@ -50,13 +49,33 @@ async def purchase_data(db_engine):
         session.add(item)
         await session.commit()
 
-        token = create_access_token(user.id)
-        return {
-            "user": user,
-            "store": store,
-            "purchase": purchase,
-            "headers": {"Authorization": f"Bearer {token}"},
-        }
+    # Create a session token directly in the sessions table
+    session_token = secrets.token_urlsafe(32)
+    now = datetime.now(UTC).isoformat()
+    expires = (datetime.now(UTC) + timedelta(days=7)).isoformat()
+
+    async with db_engine.begin() as conn:
+        await conn.execute(
+            text(
+                "INSERT INTO sessions (id, token, user_id, expires_at, created_at, updated_at) "
+                "VALUES (:id, :token, :user_id, :expires_at, :created_at, :updated_at)"
+            ),
+            {
+                "id": str(uuid.uuid4()),
+                "token": session_token,
+                "user_id": str(user.id),
+                "expires_at": expires,
+                "created_at": now,
+                "updated_at": now,
+            },
+        )
+
+    return {
+        "user": user,
+        "store": store,
+        "purchase": purchase,
+        "headers": {"Cookie": f"better-auth.session_token={session_token}"},
+    }
 
 
 @pytest.mark.asyncio

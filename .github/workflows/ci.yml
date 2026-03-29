@@ -17,6 +17,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: cartsnitch/cartsnitch
+  AUTH_IMAGE_NAME: cartsnitch/auth
 
 jobs:
   lint:
@@ -106,6 +107,57 @@ jobs:
         run: |
           git tag "v${{ steps.calver.outputs.version }}"
           git push origin "v${{ steps.calver.outputs.version }}"
+
+  build-and-push-auth:
+    runs-on: runners-cartsnitch
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate CalVer tag
+        id: calver
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          DATE_TAG=$(date -u +%Y.%m.%d)
+          EXISTING=$(git tag -l "v${DATE_TAG}*" | sort -V | tail -1)
+          if [ -z "$EXISTING" ]; then
+            VERSION="$DATE_TAG"
+          elif [ "$EXISTING" = "v${DATE_TAG}" ]; then
+            VERSION="${DATE_TAG}.2"
+          else
+            BUILD_NUM=$(echo "$EXISTING" | sed "s/v${DATE_TAG}\.//")
+            VERSION="${DATE_TAG}.$((BUILD_NUM + 1))"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (auth)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.AUTH_IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=${{ steps.calver.outputs.version }},enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push auth Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./auth
+          file: ./auth/Dockerfile
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   deploy-dev:
     runs-on: runners-cartsnitch
