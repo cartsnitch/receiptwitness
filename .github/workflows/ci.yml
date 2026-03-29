@@ -118,6 +118,8 @@ jobs:
         with:
           app-id: ${{ secrets.CARTSNITCH_APP_ID }}
           private-key: ${{ secrets.CARTSNITCH_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: infra
 
       - name: Checkout infra repo
         uses: actions/checkout@v4
