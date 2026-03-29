@@ -1,27 +1,18 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import type { User } from '../types/api.ts'
 
+/**
+ * Minimal auth state for UI reactivity.
+ *
+ * Session management is handled by Better-Auth via httpOnly cookies.
+ * This store only tracks whether we have an active session for UI
+ * gating (protected routes, nav state). No tokens in memory or localStorage.
+ */
 interface AuthState {
-  user: User | null
-  token: string | null
   isAuthenticated: boolean
-  setAuth: (user: User, token: string) => void
-  logout: () => void
+  setAuthenticated: (value: boolean) => void
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      setAuth: (user, token) => set({ user, token, isAuthenticated: true }),
-      logout: () => set({ user: null, token: null, isAuthenticated: false }),
-    }),
-    {
-      name: 'cartsnitch-auth',
-      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
-    },
-  ),
-)
+export const useAuthStore = create<AuthState>()((set) => ({
+  isAuthenticated: false,
+  setAuthenticated: (value) => set({ isAuthenticated: value }),
+}))

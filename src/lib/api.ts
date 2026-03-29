@@ -35,7 +35,7 @@ function matchMockRoute<T>(path: string): T | null {
     return getMockPriceHistory(priceHistoryMatch[1]) as T
   }
 
-  // /products?q=search or /products/:id
+  // /products/:id
   const productMatch = path.match(/^\/products\/(.+)$/)
   if (productMatch) {
     const product = mockProducts.find((p) => p.id === productMatch[1])
@@ -67,19 +67,17 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     }
   }
 
-  const token = useAuthStore.getState().token
-
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
+    credentials: 'include', // Send Better-Auth session cookie
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
   })
 
   if (res.status === 401) {
-    useAuthStore.getState().logout()
+    useAuthStore.getState().setAuthenticated(false)
     throw new Error('Unauthorized')
   }
 

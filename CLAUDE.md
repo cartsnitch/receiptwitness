@@ -12,6 +12,7 @@ CartSnitch is a self-hosted grocery price intelligence platform. This repo (`car
 | Directory | Service | Purpose |
 |-----------|---------|---------|
 | `/` (root) | Frontend | React PWA, mobile-first (this directory) |
+| `auth/` | Auth | Better-Auth Node.js service (session management, email/password, OAuth) |
 | `api/` | API Gateway | Frontend-facing REST API |
 | `common/` | Common | Shared Python models, schemas, Alembic migrations |
 | `receiptwitness/` | ReceiptWitness | Purchase data ingestion via retailer scrapers |
@@ -166,9 +167,13 @@ frontend/
 
 All data comes from the CartSnitch API gateway (`cartsnitch/api`). Base URL configured via environment variable `VITE_API_URL`.
 
-- JWT auth: store access token in memory (not localStorage), refresh token in httpOnly cookie if possible, or secure storage.
+- **Authentication via Better-Auth** (`auth/` service). Sessions are managed via httpOnly cookies — no tokens in localStorage or memory.
+  - Auth service URL configured via `VITE_AUTH_URL` (default: `http://localhost:3001`)
+  - Frontend uses `better-auth/react` client for sign-in, sign-up, sign-out, and `useSession()` hook
+  - API gateway validates sessions by querying the shared `sessions` table in Postgres
+  - Both cookie-based and Bearer token auth are supported (cookies for web, Bearer for API clients)
 - TanStack Query handles caching, background refetching, and optimistic updates.
-- API client should handle 401 responses by attempting token refresh before retrying.
+- API client sends `credentials: 'include'` on all requests to forward session cookies.
 
 ## Development Workflow
 
