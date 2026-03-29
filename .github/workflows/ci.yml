@@ -142,23 +142,3 @@ jobs:
           git add kustomization.yaml
           git commit -m "ci(dev): update cartsnitch image to ${{ needs.build-and-push.outputs.calver_tag }}"
           git push origin main
-
-  trigger-uat:
-    runs-on: runners-cartsnitch
-    needs: [deploy-dev, build-and-push]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Create UAT issue in Paperclip
-        run: |
-          curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.PAPERCLIP_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            "${{ secrets.PAPERCLIP_API_URL }}/api/companies/${{ secrets.PAPERCLIP_COMPANY_ID }}/issues" \
-            --data-raw '{
-              "title": "UAT: cartsnitch ${{ needs.build-and-push.outputs.calver_tag }} deployed to dev",
-              "description": "## UAT Required\n\nService: cartsnitch (frontend)\nImage: ghcr.io/cartsnitch/cartsnitch:${{ needs.build-and-push.outputs.calver_tag }}\nCommit: ${{ github.sha }}\nWorkflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n\nPlease run full regression against cartsnitch.dev.farh.net",
-              "status": "todo",
-              "priority": "high",
-              "assigneeAgentId": "1fc33bd9-308c-4abf-a355-87d12b6b0064",
-              "projectId": "05f7827d-54df-4ff8-9b27-293ffba6e049"
-            }'
