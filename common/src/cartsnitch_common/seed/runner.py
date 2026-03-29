@@ -2,8 +2,10 @@
 
 import random
 import time
+import uuid
 from typing import Any
 
+import bcrypt
 from faker import Faker
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -184,6 +186,65 @@ def run_seed(
 
         session.commit()
 
+        _seed_uat_user(session)
+
     elapsed = time.monotonic() - t0
     _log("")
     _log(f"Seed complete in {elapsed:.1f}s")
+
+
+# ---------------------------------------------------------------------------
+# UAT seed user
+# ---------------------------------------------------------------------------
+
+UAT_EMAIL = "uat@cartsnitch.com"
+UAT_PASSWORD = "CartSnitch-UAT-2026!"
+UAT_DISPLAY_NAME = "UAT Tester"
+UAT_USER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
+
+
+def _seed_uat_user(session: Session) -> None:
+    """Insert or verify the dedicated UAT test user.
+
+    The user is created via Better-Auth's bcrypt hashing path so credentials
+    work against the live auth service. Idempotent — skips if the user already
+    exists.
+    """
+    existing = session.execute(
+        text("SELECT id FROM users WHERE email = :email"),
+        {"email": UAT_EMAIL},
+    ).fetchone()
+
+    if existing is not None:
+        _log(f"UAT user {UAT_EMAIL} already exists — skipping")
+        return
+
+    password_hash = bcrypt.hashpw(UAT_PASSWORD.encode(), bcrypt.gensalt()).decode()
+
+    session.execute(
+        text(
+            "INSERT INTO users (id, email, hashed_password, display_name, email_verified, created_at, updated_at) "
+            "VALUES (:id, :email, :hashed_password, :display_name, true, now(), now())"
+        ),
+        {
+            "id": str(UAT_USER_ID),
+            "email": UAT_EMAIL,
+            "hashed_password": password_hash,
+            "display_name": UAT_DISPLAY_NAME,
+        },
+    )
+
+    session.execute(
+        text(
+            "INSERT INTO accounts (id, user_id, account_id, provider_id, password, created_at, updated_at) "
+            "VALUES (gen_random_uuid()::text, :user_id, :account_id, 'credential', :password, now(), now())"
+        ),
+        {
+            "user_id": str(UAT_USER_ID),
+            "account_id": str(UAT_USER_ID),
+            "password": password_hash,
+        },
+    )
+
+    session.commit()
+    _log(f"UAT user {UAT_EMAIL} created")
