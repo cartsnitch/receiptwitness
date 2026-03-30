@@ -46,9 +46,21 @@ jobs:
       - name: Run tests
         run: npx vitest run
 
+  e2e:
+    runs-on: runners-cartsnitch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+
   build-and-push:
     runs-on: runners-cartsnitch
-    needs: [lint, test]
+    needs: [lint, test, e2e]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
     steps:
@@ -110,7 +122,7 @@ jobs:
 
   build-and-push-auth:
     runs-on: runners-cartsnitch
-    needs: [lint, test]
+    needs: [lint, test, e2e]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
     steps:
