@@ -111,6 +111,8 @@ jobs:
   build-and-push-auth:
     runs-on: runners-cartsnitch
     needs: [lint, test]
+    outputs:
+      calver_tag: ${{ steps.calver.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -161,7 +163,7 @@ jobs:
 
   deploy-dev:
     runs-on: runners-cartsnitch
-    needs: [build-and-push]
+    needs: [build-and-push, build-and-push-auth]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Generate GitHub App token
@@ -191,6 +193,7 @@ jobs:
         run: |
           cd infra/apps/overlays/dev
           kustomize edit set image ghcr.io/cartsnitch/cartsnitch:${{ needs.build-and-push.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/auth:${{ needs.build-and-push-auth.outputs.calver_tag }}
 
       - name: Commit and push to infra
         run: |
@@ -198,5 +201,5 @@ jobs:
           git config user.name "cartsnitch-ci[bot]"
           git config user.email "cartsnitch-ci[bot]@users.noreply.github.com"
           git add apps/overlays/dev/kustomization.yaml
-          git commit -m "ci(dev): update cartsnitch image to ${{ needs.build-and-push.outputs.calver_tag }}"
+          git commit -m "ci(dev): update cartsnitch and auth images to ${{ needs.build-and-push.outputs.calver_tag }}"
           git push origin main
