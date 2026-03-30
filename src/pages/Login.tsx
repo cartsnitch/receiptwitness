@@ -5,6 +5,13 @@ import { api } from '../lib/api.ts'
 import { mockUser } from '../lib/mock-data.ts'
 import type { User } from '../types/api.ts'
 
+interface TokenResponse {
+  access_token: string
+  refresh_token: string
+  token_type: string
+  expires_in: number
+}
+
 export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,8 +31,12 @@ export function Login() {
 
     setLoading(true)
     try {
-      const res = await api.post<{ user: User; token: string }>('/auth/login', { email, password })
-      setAuth(res.user, res.token)
+      const res = await api.post<TokenResponse>('/auth/login', { email, password })
+      const userRes = await fetch(`${import.meta.env.VITE_API_URL ?? '/api/v1'}/auth/me`, {
+        headers: { Authorization: `Bearer ${res.access_token}` },
+      })
+      const user = (await userRes.json()) as User
+      setAuth(user, res.access_token)
       navigate('/')
     } catch {
       if (import.meta.env.VITE_MOCK_AUTH === 'true') {
