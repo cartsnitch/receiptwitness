@@ -1,4 +1,9 @@
-"""Auth routes: register, login, refresh, me, update, delete."""
+"""Auth routes: user profile management.
+
+Registration, login, refresh, and session management are handled by
+the Better-Auth service (auth/). This router provides user profile
+endpoints that query our own user data from the shared database.
+"""
 
 from uuid import UUID
 
@@ -8,47 +13,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from cartsnitch_api.auth.dependencies import get_current_user
 from cartsnitch_api.database import get_db
 from cartsnitch_api.schemas import (
-    LoginRequest,
-    RefreshRequest,
-    RegisterRequest,
-    TokenResponse,
     UpdateUserRequest,
     UserResponse,
 )
 from cartsnitch_api.services.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
-    svc = AuthService(db)
-    try:
-        return await svc.register(body.email, body.password, body.display_name)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
-
-
-@router.post("/login", response_model=TokenResponse)
-async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
-    svc = AuthService(db)
-    try:
-        return await svc.login(body.email, body.password)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
-        ) from None
-
-
-@router.post("/refresh", response_model=TokenResponse)
-async def refresh(body: RefreshRequest, db: AsyncSession = Depends(get_db)):
-    svc = AuthService(db)
-    try:
-        return await svc.refresh(body.refresh_token)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
-        ) from None
 
 
 @router.get("/me", response_model=UserResponse)

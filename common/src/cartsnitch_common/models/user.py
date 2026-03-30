@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from cartsnitch_common.constants import AccountStatus
@@ -23,6 +23,8 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     display_name: Mapped[str | None] = mapped_column(String(100))
+    email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+    image: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
     store_accounts: Mapped[list["UserStoreAccount"]] = relationship(back_populates="user")

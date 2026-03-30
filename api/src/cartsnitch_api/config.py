@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     # Valid Fernet key for local dev — MUST be overridden in production
     fernet_key: str = "7reF42nmTwbdN21PBoubGp7h_FU8qSimstmlaMLoRK8="
 
+    auth_service_url: str = "http://auth:3001"
+
     cors_origins: list[str] = ["http://localhost:3000", "https://cartsnitch.com"]
 
     receiptwitness_url: str = "http://receiptwitness:8001"

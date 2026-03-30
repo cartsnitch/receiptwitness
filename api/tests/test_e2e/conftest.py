@@ -10,9 +10,9 @@ from decimal import Decimal
 from uuid import UUID
 
 import pytest
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from cartsnitch_api.auth.jwt import decode_token
 from cartsnitch_api.models import (
     Coupon,
     NormalizedProduct,
@@ -126,10 +126,16 @@ async def seed_data(db_engine, auth_headers):
         session.add_all(prices)
         await session.flush()
 
-        # -- Purchases (need the user_id from the registered test user) --
-        token = auth_headers["Authorization"].split(" ")[1]
-        payload = decode_token(token)
-        user_id = UUID(payload["sub"])
+        # -- Get the user_id from the session token in auth_headers --
+        cookie_str = auth_headers.get("Cookie", "")
+        session_token = cookie_str.split("=", 1)[1] if "=" in cookie_str else ""
+
+        result = await session.execute(
+            text("SELECT user_id FROM sessions WHERE token = :token"),
+            {"token": session_token},
+        )
+        row = result.first()
+        user_id = UUID(row[0])
 
         purchase1 = Purchase(
             user_id=user_id,

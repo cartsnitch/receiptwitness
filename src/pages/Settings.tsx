@@ -1,18 +1,21 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { authClient } from '../lib/auth-client.ts'
 import { useAuthStore } from '../stores/auth.ts'
 import { useThemeStore } from '../stores/theme.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
 
 export function Settings() {
-  const user = useAuthStore((s) => s.user)
-  const logout = useAuthStore((s) => s.logout)
+  const { data: session } = authClient.useSession()
+  const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
   const navigate = useNavigate()
   const { theme, setTheme } = useThemeStore()
 
-  const connectedStores = user?.connectedStores ?? []
+  const user = session?.user
+  const connectedStores: string[] = []
 
-  function handleSignOut() {
-    logout()
+  async function handleSignOut() {
+    await authClient.signOut()
+    setAuthenticated(false)
     navigate('/login')
   }
 
