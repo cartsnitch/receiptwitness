@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authClient } from '../lib/auth-client.ts'
+import { useAuthStore } from '../stores/auth.ts'
 
 export function Login() {
   const [email, setEmail] = useState('')
@@ -8,6 +9,7 @@ export function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,6 +41,7 @@ export function Login() {
       }
     } catch {
       if (import.meta.env.VITE_MOCK_AUTH === 'true') {
+        setAuthenticated(true)
         navigate('/')
       } else {
         setError('Invalid email or password. Please try again.')
