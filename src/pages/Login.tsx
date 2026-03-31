@@ -46,7 +46,7 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4">
       <h1 className="mb-2 text-3xl font-bold text-gray-900">CartSnitch</h1>
       <p className="mb-8 text-sm text-gray-500">Track prices. Save money.</p>
 
@@ -92,6 +92,6 @@ export function Login() {
           Sign up
         </Link>
       </p>
-    </div>
+    </main>
   )
 }
