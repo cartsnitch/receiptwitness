@@ -36,6 +36,15 @@ export const auth = betterAuth({
   },
 
   session: {
+    modelName: "sessions",
+    fields: {
+      userId: "user_id",
+      expiresAt: "expires_at",
+      ipAddress: "ip_address",
+      userAgent: "user_agent",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // refresh after 1 day
     cookieCache: {
