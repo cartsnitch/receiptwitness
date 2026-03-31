@@ -173,6 +173,7 @@ function AuthenticatedDashboard({ userName }: { userName: string }) {
 function DashboardSkeleton() {
   return (
     <div className="animate-pulse">
+      <h1 className="sr-only">Loading CartSnitch…</h1>
       <div className="h-8 w-40 rounded bg-gray-200" />
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="h-24 rounded-xl bg-gray-200" />
