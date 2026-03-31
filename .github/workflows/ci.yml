@@ -72,6 +72,31 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
 
+  lighthouse:
+    runs-on: runners-cartsnitch
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install Chromium for Lighthouse
+        run: |
+          npm install -g playwright
+          npx playwright install --with-deps chromium
+      - name: Start preview server
+        run: |
+          npm run preview &
+          npx wait-on http://localhost:4173/ --timeout 30000
+      - name: Run Lighthouse CI
+        run: |
+          CHROME_PATH=$(find /home/runner/.cache/ms-playwright -name chrome -type f 2>/dev/null | head -1)
+          npm install -g @lhci/cli
+          LHCI_CHROME_PATH="$CHROME_PATH" lhci autorun
+
   build-and-push:
     runs-on: runners-cartsnitch
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
