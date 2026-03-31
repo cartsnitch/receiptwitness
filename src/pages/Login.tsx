@@ -31,8 +31,14 @@ export function Login() {
         throw new Error(authError.message ?? 'Sign in failed')
       }
 
-      setAuthenticated(true)
-      navigate('/')
+      // After successful signIn, force a session fetch to confirm the cookie is set
+      // before navigating to the protected route
+      const sessionResult = await authClient.getSession()
+      if (sessionResult.data) {
+        navigate('/')
+      } else {
+        setError('Sign in failed. Please try again.')
+      }
     } catch {
       if (import.meta.env.VITE_MOCK_AUTH === 'true') {
         setAuthenticated(true)

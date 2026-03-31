@@ -95,7 +95,7 @@ jobs:
         run: |
           CHROME_PATH=$(find /home/runner/.cache/ms-playwright -name chrome -type f 2>/dev/null | head -1)
           npm install -g @lhci/cli
-          LHCI_CHROME_PATH="$CHROME_PATH" lhci autorun
+          CHROME_PATH="$CHROME_PATH" lhci autorun --chrome-flags="--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage"
 
   build-and-push:
     runs-on: runners-cartsnitch
