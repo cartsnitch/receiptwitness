@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authClient } from '../lib/auth-client.ts'
-import { useAuthStore } from '../stores/auth.ts'
 
 export function Register() {
   const [name, setName] = useState('')
@@ -10,7 +9,6 @@ export function Register() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -38,11 +36,17 @@ export function Register() {
         throw new Error(authError.message ?? 'Registration failed')
       }
 
-      setAuthenticated(true)
-      navigate('/')
+      // After successful signUp, force a session fetch to confirm the cookie is set
+      // before navigating to the protected route
+      const sessionResult = await authClient.getSession()
+      if (sessionResult.data) {
+        navigate('/')
+      } else {
+        // Session not established — show success message and link to login
+        setError('Account created! Please sign in.')
+      }
     } catch {
       if (import.meta.env.VITE_MOCK_AUTH === 'true') {
-        setAuthenticated(true)
         navigate('/')
       } else {
         setError('Registration failed. Please try again.')
