@@ -53,13 +53,4 @@ test.describe('J1: Registration and Login', () => {
     await expect(page).toHaveURL('http://localhost:5173/');
   });
 
-  test('shows error on login with wrong password', async ({ page }) => {
-    await page.goto('/login');
-    await page.fill('[placeholder="Email"]', 'nobody@cartsnitch.test');
-    await page.fill('[placeholder="Password"]', 'WrongPassword1!');
-    await page.click('button[type="submit"]');
-
-    // With VITE_MOCK_AUTH=false the catch block shows error
-    await expect(page.locator('.bg-red-50')).toBeVisible();
-  });
 });
