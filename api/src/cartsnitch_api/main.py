@@ -2,7 +2,7 @@
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 
 from cartsnitch_api.auth.routes import router as auth_router
 from cartsnitch_api.middleware.cors import add_cors_middleware
@@ -46,15 +46,19 @@ def create_app() -> FastAPI:
     # Routers
     app.include_router(health_router)
     app.include_router(auth_router)
-    app.include_router(stores_router)
-    app.include_router(purchases_router)
-    app.include_router(products_router)
-    app.include_router(prices_router)
-    app.include_router(coupons_router)
-    app.include_router(shopping_router)
-    app.include_router(alerts_router)
-    app.include_router(scraping_router)
-    app.include_router(public_router)
+
+    # Data endpoints mounted under /api/v1
+    v1_router = APIRouter(prefix="/api/v1")
+    v1_router.include_router(stores_router)
+    v1_router.include_router(purchases_router)
+    v1_router.include_router(products_router)
+    v1_router.include_router(prices_router)
+    v1_router.include_router(coupons_router)
+    v1_router.include_router(shopping_router)
+    v1_router.include_router(alerts_router)
+    v1_router.include_router(scraping_router)
+    v1_router.include_router(public_router)
+    app.include_router(v1_router)
 
     return app
 
