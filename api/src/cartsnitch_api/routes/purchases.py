@@ -15,7 +15,7 @@ router = APIRouter(prefix="/purchases", tags=["purchases"])
 
 @router.get("", response_model=list[PurchaseResponse])
 async def list_purchases(
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     store_id: UUID | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
@@ -27,7 +27,7 @@ async def list_purchases(
 
 @router.get("/stats", response_model=PurchaseStatsResponse)
 async def purchase_stats(
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = PurchaseService(db)
@@ -37,7 +37,7 @@ async def purchase_stats(
 @router.get("/{purchase_id}", response_model=PurchaseDetailResponse)
 async def get_purchase(
     purchase_id: UUID,
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = PurchaseService(db)

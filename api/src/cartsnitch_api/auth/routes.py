@@ -5,8 +5,6 @@ the Better-Auth service (auth/). This router provides user profile
 endpoints that query our own user data from the shared database.
 """
 
-from uuid import UUID
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,7 +21,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = AuthService(db)
@@ -38,7 +36,7 @@ async def get_me(
 @router.patch("/me", response_model=UserResponse)
 async def update_me(
     body: UpdateUserRequest,
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = AuthService(db)
@@ -54,7 +52,7 @@ async def update_me(
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_me(
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = AuthService(db)

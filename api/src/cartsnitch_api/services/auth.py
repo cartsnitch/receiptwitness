@@ -5,8 +5,6 @@ handled by the Better-Auth service (auth/). This service provides
 user lookup and profile update operations for the API gateway.
 """
 
-from uuid import UUID
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,7 +13,7 @@ class AuthService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def get_user(self, user_id: UUID) -> dict:
+    async def get_user(self, user_id: str) -> dict:
         from cartsnitch_api.models import User
 
         result = await self.db.execute(select(User).where(User.id == user_id))
@@ -30,7 +28,7 @@ class AuthService:
             "created_at": user.created_at,
         }
 
-    async def update_user(self, user_id: UUID, **fields) -> dict:
+    async def update_user(self, user_id: str, **fields) -> dict:
         from cartsnitch_api.models import User
 
         result = await self.db.execute(select(User).where(User.id == user_id))
@@ -58,7 +56,7 @@ class AuthService:
             "created_at": user.created_at,
         }
 
-    async def delete_user(self, user_id: UUID) -> None:
+    async def delete_user(self, user_id: str) -> None:
         from cartsnitch_api.models import User
 
         result = await self.db.execute(select(User).where(User.id == user_id))
