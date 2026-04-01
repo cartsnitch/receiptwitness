@@ -5,6 +5,7 @@ Sessions are verified by querying the shared sessions table directly.
 """
 
 from datetime import UTC, datetime
+from hashlib import sha256
 from uuid import UUID
 
 from fastapi import Cookie, Depends, Header, HTTPException, Request, status
@@ -27,10 +28,13 @@ async def _validate_session_token(token: str, db: AsyncSession) -> UUID:
     """Validate a Better-Auth session token against the sessions table.
 
     Returns the user_id (as UUID) if the session is valid and not expired.
+    Better-Auth v1.5.6+ stores tokens as SHA-256 hashes, so we hash the
+    incoming raw token before querying.
     """
+    hashed_token = sha256(token.encode("utf-8")).hexdigest()
     result = await db.execute(
         text("SELECT user_id, expires_at FROM sessions WHERE token = :token"),
-        {"token": token},
+        {"token": hashed_token},
     )
     row = result.first()
 
