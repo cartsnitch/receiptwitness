@@ -16,7 +16,7 @@ router = APIRouter(prefix="/coupons", tags=["coupons"])
 @router.get("", response_model=list[CouponResponse])
 async def list_coupons(
     store_id: UUID | None = Query(None),
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = CouponService(db)
@@ -25,7 +25,7 @@ async def list_coupons(
 
 @router.get("/relevant", response_model=list[CouponResponse])
 async def relevant_coupons(
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = CouponService(db)

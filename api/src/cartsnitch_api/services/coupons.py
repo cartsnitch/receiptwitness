@@ -29,7 +29,7 @@ class CouponService:
         coupons = result.scalars().all()
         return [self._to_dict(c) for c in coupons]
 
-    async def relevant_coupons(self, user_id: UUID) -> list[dict]:
+    async def relevant_coupons(self, user_id: str) -> list[dict]:
         """Coupons for products the user has purchased."""
         from cartsnitch_api.models import Coupon, PurchaseItem
 

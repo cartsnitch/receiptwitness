@@ -13,7 +13,7 @@ class PurchaseService:
 
     async def list_purchases(
         self,
-        user_id: UUID,
+        user_id: str,
         store_id: UUID | None = None,
         page: int = 1,
         page_size: int = 20,
@@ -56,7 +56,7 @@ class PurchaseService:
             for p, item_count, store_name in result.all()
         ]
 
-    async def get_purchase(self, purchase_id: UUID, user_id: UUID) -> dict:
+    async def get_purchase(self, purchase_id: UUID, user_id: str) -> dict:
         from cartsnitch_api.models import Purchase
 
         result = await self.db.execute(
@@ -88,7 +88,7 @@ class PurchaseService:
             ],
         }
 
-    async def get_stats(self, user_id: UUID) -> dict:
+    async def get_stats(self, user_id: str) -> dict:
         from cartsnitch_api.models import Purchase
 
         result = await self.db.execute(

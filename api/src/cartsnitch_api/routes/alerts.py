@@ -1,7 +1,5 @@
 """Alert routes: list alerts, manage settings."""
 
-from uuid import UUID
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,7 +13,7 @@ router = APIRouter(prefix="/alerts", tags=["alerts"])
 
 @router.get("", response_model=list[AlertResponse])
 async def list_alerts(
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = AlertService(db)
@@ -24,7 +22,7 @@ async def list_alerts(
 
 @router.get("/settings", response_model=AlertSettingsResponse)
 async def get_alert_settings(
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = AlertService(db)
@@ -34,7 +32,7 @@ async def get_alert_settings(
 @router.put("/settings")
 async def update_alert_settings(
     body: AlertSettingsRequest,
-    user_id: UUID = Depends(get_current_user),
+    user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     raise HTTPException(
