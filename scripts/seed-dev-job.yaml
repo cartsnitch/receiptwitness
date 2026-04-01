@@ -1,0 +1,61 @@
+# seed-dev-job.yaml
+# K8s Job to run the CartSnitch seed runner against the dev database.
+#
+# Usage:
+#   kubectl apply -f seed-dev-job.yaml -n cartsnitch-dev
+#
+# To view logs:
+#   kubectl logs -n cartsnitch-dev job/seed-dev -f
+#
+# To re-run after fixing issues:
+#   kubectl delete -f seed-dev-job.yaml -n cartsnitch-dev && kubectl apply -f seed-dev-job.yaml -n cartsnitch-dev
+#
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed-dev
+  namespace: cartsnitch-dev
+  labels:
+    app: cartsnitch
+    component: seed
+    environment: dev
+  annotations:
+    description: "Runs cartsnitch-common seed runner to populate dev database with realistic test data."
+spec:
+  # Prevent retries — a failed seed run should be investigated, not auto-repeated.
+  backoffLimit: 0
+  # Do not run concurrently; sequential runs are safer for truncate+reseed.
+  concurrencyPolicy: Forbid
+  template:
+    metadata:
+      labels:
+        app: cartsnitch
+        component: seed
+        environment: dev
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed
+          # Use slim Python image with the cartsnitch-common package installed from git.
+          # The common repo is public; no additional secret is needed for the pip install.
+          image: python:3.12-slim
+          command:
+            - sh
+            - -c
+            - |
+              pip install --no-cache-dir "cartsnitch-common @ git+https://github.com/cartsnitch/common.git@main" && \
+              python -m cartsnitch_common.seed --database-url "$${DATABASE_URL}"
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cartsnitch-secrets
+                  key: database-url-pg
+                  optional: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
