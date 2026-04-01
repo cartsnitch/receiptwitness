@@ -61,5 +61,5 @@ export const handlers = [
   http.get('/api/v1/products', () => HttpResponse.json(mockProducts)),
   http.get('/api/v1/products/prod_1', () => HttpResponse.json(mockProducts[0])),
   http.get('/api/v1/coupons', () => HttpResponse.json(mockCoupons)),
-  http.get('/api/v1/price-alerts', () => HttpResponse.json(mockAlerts)),
+  http.get('/api/v1/alerts', () => HttpResponse.json(mockAlerts)),
 ]
