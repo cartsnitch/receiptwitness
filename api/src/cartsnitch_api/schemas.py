@@ -1,6 +1,6 @@
 """Pydantic v2 request/response schemas for all API endpoints."""
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
@@ -60,7 +60,7 @@ class PurchaseResponse(BaseModel):
     id: UUID
     store_id: UUID
     store_name: str
-    purchased_at: datetime
+    purchased_at: date
     total: float
     item_count: int
 
@@ -142,7 +142,7 @@ class CouponResponse(BaseModel):
     discount_value: float
     discount_type: str
     product_id: UUID | None = None
-    expires_at: datetime | None = None
+    expires_at: date | None = None
 
 
 # ---------- Shopping ----------
