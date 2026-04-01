@@ -32,7 +32,7 @@ class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     __tablename__ = "purchases"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     store_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("stores.id"), nullable=False)
     store_location_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("store_locations.id"))
     receipt_id: Mapped[str] = mapped_column(String(200), nullable=False)

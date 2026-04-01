@@ -9,15 +9,9 @@ vi.mock('./lib/auth-client.ts', () => ({
 }))
 
 describe('App', () => {
-  it('renders the dashboard on the root route', () => {
+  it('redirects unauthenticated users to login', () => {
     render(<App />)
     expect(screen.getByText('CartSnitch')).toBeInTheDocument()
-  })
-
-  it('renders the bottom navigation', () => {
-    render(<App />)
-    expect(screen.getByText('Home')).toBeInTheDocument()
-    expect(screen.getByText('Purchases')).toBeInTheDocument()
-    expect(screen.getByText('Products')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
   })
 })

@@ -31,8 +31,8 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            <Route index element={<Dashboard />} />
             <Route element={<ProtectedRoute />}>
+              <Route index element={<Dashboard />} />
               <Route path="purchases" element={<Purchases />} />
               <Route path="purchases/:id" element={<PurchaseDetail />} />
               <Route path="products" element={<Products />} />
