@@ -9,13 +9,13 @@ from sqlalchemy import Date, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from cartsnitch_api.constants import SizeUnit
-from cartsnitch_api.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from cartsnitch_api.models.base import Base, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from cartsnitch_api.models.product import NormalizedProduct
 
 
-class ShrinkflationEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+class ShrinkflationEvent(UUIDPrimaryKeyMixin, Base):
     """Detected shrinkflation event — product size changed while price held or rose."""
 
     __tablename__ = "shrinkflation_events"

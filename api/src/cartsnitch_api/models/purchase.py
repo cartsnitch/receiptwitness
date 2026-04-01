@@ -18,7 +18,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from cartsnitch_api.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from cartsnitch_api.models.base import Base, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from cartsnitch_api.models.price import PriceHistory
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from cartsnitch_api.models.user import User
 
 
-class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+class Purchase(UUIDPrimaryKeyMixin, Base):
     """A single shopping trip / receipt."""
 
     __tablename__ = "purchases"
@@ -61,7 +61,7 @@ class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
 
-class PurchaseItem(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+class PurchaseItem(UUIDPrimaryKeyMixin, Base):
     """Individual line item on a receipt."""
 
     __tablename__ = "purchase_items"

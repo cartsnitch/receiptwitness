@@ -1,12 +1,7 @@
-import React, { Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { authClient } from '../lib/auth-client.ts'
-import { usePurchases, usePriceAlerts, usePriceHistory } from '../hooks/useApi.ts'
+import { usePurchases, usePriceAlerts } from '../hooks/useApi.ts'
 import { StoreIcon } from '../components/StoreIcon.tsx'
-
-const LazySparklineCard = React.lazy(() =>
-  import('../components/SparklineChart.tsx').then((mod) => ({ default: mod.SparklineCard }))
-)
 
 export function Dashboard() {
   const { data: session, isPending } = authClient.useSession()
@@ -44,18 +39,10 @@ export function Dashboard() {
 function AuthenticatedDashboard({ userName }: { userName: string }) {
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases()
   const { data: alerts = [], isLoading: alertsLoading } = usePriceAlerts()
-  const { data: eggHistory = [] } = usePriceHistory('prod10')
-  const { data: milkHistory = [] } = usePriceHistory('prod1')
 
   const triggeredAlerts = alerts.filter((a) => a.triggered)
   const watchingAlerts = alerts.filter((a) => !a.triggered)
   const recentPurchases = purchases.slice(0, 3)
-
-  const sparklineData = eggHistory.filter((p) => p.storeId === 'meijer').slice(-8)
-  const milkSparkline = milkHistory.filter((p) => p.storeId === 'kroger').slice(-8)
-
-  const eggCurrent = sparklineData.length > 0 ? `$${sparklineData[sparklineData.length - 1].price.toFixed(2)}` : '—'
-  const milkCurrent = milkSparkline.length > 0 ? `$${milkSparkline[milkSparkline.length - 1].price.toFixed(2)}` : '—'
 
   if (purchasesLoading || alertsLoading) {
     return <DashboardSkeleton />
@@ -106,11 +93,8 @@ function AuthenticatedDashboard({ userName }: { userName: string }) {
       {/* Price trend sparklines */}
       <section className="mt-6">
         <h2 className="mb-3 text-lg font-semibold text-gray-700">Price Trends</h2>
-        <div className="space-y-3">
-          <Suspense fallback={<SparklinePlaceholder />}>
-            <LazySparklineCard label="Eggs (dozen)" data={sparklineData} current={eggCurrent} />
-            <LazySparklineCard label="Whole Milk (1 gal)" data={milkSparkline} current={milkCurrent} />
-          </Suspense>
+        <div className="rounded-xl bg-white p-4 shadow-sm text-center text-sm text-gray-400">
+          Connect a store to see price trends
         </div>
       </section>
 
@@ -184,18 +168,6 @@ function DashboardSkeleton() {
         <div className="h-16 rounded-xl bg-gray-200" />
         <div className="h-16 rounded-xl bg-gray-200" />
       </div>
-    </div>
-  )
-}
-
-function SparklinePlaceholder() {
-  return (
-    <div className="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm animate-pulse">
-      <div className="min-w-0 flex-1">
-        <div className="h-4 w-24 rounded bg-gray-200" />
-        <div className="mt-2 h-6 w-16 rounded bg-gray-200" />
-      </div>
-      <div className="h-10 w-24 rounded bg-gray-100" />
     </div>
   )
 }
