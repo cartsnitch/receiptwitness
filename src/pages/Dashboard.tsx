@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import { authClient } from '../lib/auth-client.ts'
 import { usePurchases, usePriceAlerts } from '../hooks/useApi.ts'
