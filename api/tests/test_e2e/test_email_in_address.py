@@ -1,4 +1,4 @@
-"""Tests for GET /auth/me/email-in-address endpoint."""
+"""Tests for GET /api/v1/me/email-in-address endpoint."""
 
 import pytest
 from httpx import AsyncClient
@@ -8,7 +8,7 @@ from httpx import AsyncClient
 async def test_get_email_in_address_authenticated(client: AsyncClient, auth_headers: dict):
     """Authenticated user gets their email-in address."""
     response = await client.get(
-        "/auth/me/email-in-address",
+        "/api/v1/me/email-in-address",
         headers=auth_headers,
     )
 
@@ -27,7 +27,7 @@ async def test_get_email_in_address_authenticated(client: AsyncClient, auth_head
 @pytest.mark.asyncio
 async def test_get_email_in_address_unauthenticated(client: AsyncClient):
     """Unauthenticated request returns 401."""
-    response = await client.get("/auth/me/email-in-address")
+    response = await client.get("/api/v1/me/email-in-address")
     assert response.status_code == 401
 
 
@@ -35,7 +35,7 @@ async def test_get_email_in_address_unauthenticated(client: AsyncClient):
 async def test_get_email_in_address_invalid_token(client: AsyncClient):
     """Invalid JWT token returns 401."""
     response = await client.get(
-        "/auth/me/email-in-address",
+        "/api/v1/me/email-in-address",
         headers={"Authorization": "Bearer invalid-token-xyz"},
     )
     assert response.status_code == 401
@@ -45,7 +45,7 @@ async def test_get_email_in_address_invalid_token(client: AsyncClient):
 async def test_email_address_format(client: AsyncClient, auth_headers: dict):
     """Email address format is receipts+{22-char-urlsafe-token}@receipts.cartsnitch.com."""
     response = await client.get(
-        "/auth/me/email-in-address",
+        "/api/v1/me/email-in-address",
         headers=auth_headers,
     )
 

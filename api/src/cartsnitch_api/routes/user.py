@@ -19,7 +19,13 @@ async def get_email_in_address(
     svc = AuthService(db)
     try:
         email_address = await svc.get_email_in_address(user_id)
-        return EmailInAddressResponse(email_address=email_address)
+        return EmailInAddressResponse(
+            email_address=email_address,
+            instructions=(
+                "Forward your digital receipt emails to this address. "
+                "We currently support Meijer, Kroger, and Target receipt emails."
+            ),
+        )
     except LookupError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"

@@ -76,4 +76,4 @@ class AuthService:
         if not user:
             raise LookupError("User not found")
 
-        return f"{user.email_inbound_token}@email.cartsnitch.com"
+        return f"receipts+{user.email_inbound_token}@receipts.cartsnitch.com"

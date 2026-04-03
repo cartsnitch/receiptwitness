@@ -24,6 +24,7 @@ class UserResponse(BaseModel):
 
 class EmailInAddressResponse(BaseModel):
     email_address: str
+    instructions: str
 
 
 # ---------- Stores ----------
