@@ -1,10 +1,11 @@
 """User and UserStoreAccount models."""
 
+import secrets
 import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from cartsnitch_api.constants import AccountStatus
@@ -16,15 +17,20 @@ if TYPE_CHECKING:
     from cartsnitch_api.models.store import Store
 
 
-class User(TimestampMixin, Base):
+class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     """Application user."""
 
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     display_name: Mapped[str | None] = mapped_column(String(100))
+    email_inbound_token: Mapped[str] = mapped_column(
+        String(22),
+        nullable=False,
+        unique=True,
+        default=lambda: secrets.token_urlsafe(16),
+    )
 
     # Relationships
     store_accounts: Mapped[list["UserStoreAccount"]] = relationship(back_populates="user")
@@ -37,7 +43,7 @@ class UserStoreAccount(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "user_store_accounts"
     __table_args__ = (UniqueConstraint("user_id", "store_id", name="uq_user_store_account"),)
 
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     store_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("stores.id"), nullable=False)
     session_data: Mapped[dict | None] = mapped_column(EncryptedJSON)
     session_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

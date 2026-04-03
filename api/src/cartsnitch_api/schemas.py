@@ -1,13 +1,33 @@
 """Pydantic v2 request/response schemas for all API endpoints."""
 
-from datetime import date, datetime
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
 
 # ---------- Auth ----------
-# Registration, login, and session management are handled by Better-Auth (auth/ service).
-# These schemas are for the profile management endpoints only.
+
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    display_name: str = Field(min_length=1, max_length=100)
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
 
 
 class UpdateUserRequest(BaseModel):
@@ -16,7 +36,7 @@ class UpdateUserRequest(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: str
+    id: UUID
     email: str
     display_name: str
     created_at: datetime
@@ -60,7 +80,7 @@ class PurchaseResponse(BaseModel):
     id: UUID
     store_id: UUID
     store_name: str
-    purchased_at: date
+    purchased_at: datetime
     total: float
     item_count: int
 
@@ -142,7 +162,7 @@ class CouponResponse(BaseModel):
     discount_value: float
     discount_type: str
     product_id: UUID | None = None
-    expires_at: date | None = None
+    expires_at: datetime | None = None
 
 
 # ---------- Shopping ----------

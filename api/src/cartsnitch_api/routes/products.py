@@ -15,7 +15,7 @@ router = APIRouter(prefix="/products", tags=["products"])
 
 @router.get("", response_model=list[ProductResponse])
 async def list_products(
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     q: str | None = Query(None),
     category: str | None = Query(None),
     page: int = Query(1, ge=1),
@@ -29,7 +29,7 @@ async def list_products(
 @router.get("/{product_id}", response_model=ProductDetailResponse)
 async def get_product(
     product_id: UUID,
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = ProductService(db)
@@ -44,7 +44,7 @@ async def get_product(
 @router.get("/{product_id}/prices", response_model=PriceTrendResponse)
 async def get_product_prices(
     product_id: UUID,
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = ProductService(db)

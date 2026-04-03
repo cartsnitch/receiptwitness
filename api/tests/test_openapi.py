@@ -89,4 +89,4 @@ async def test_route_count():
                 if method in ("get", "post", "put", "delete", "patch"):
                     count += 1
 
-        assert count == 33, f"Expected 33 routes, found {count}"
+        assert count == 34, f"Expected 34 routes, found {count}"

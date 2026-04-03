@@ -20,7 +20,7 @@ router = APIRouter(prefix="/prices", tags=["prices"])
 
 @router.get("/trends", response_model=list[PriceTrendResponse])
 async def price_trends(
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     category: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -30,7 +30,7 @@ async def price_trends(
 
 @router.get("/increases", response_model=list[PriceIncreaseResponse])
 async def price_increases(
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = PriceService(db)
@@ -40,7 +40,7 @@ async def price_increases(
 @router.get("/comparison", response_model=list[PriceComparisonResponse])
 async def price_comparison(
     product_ids: Annotated[list[UUID], Query()],
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = PriceService(db)

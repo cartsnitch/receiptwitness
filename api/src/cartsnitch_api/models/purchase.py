@@ -18,7 +18,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from cartsnitch_api.models.base import Base, UUIDPrimaryKeyMixin
+from cartsnitch_api.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from cartsnitch_api.models.price import PriceHistory
@@ -27,12 +27,12 @@ if TYPE_CHECKING:
     from cartsnitch_api.models.user import User
 
 
-class Purchase(UUIDPrimaryKeyMixin, Base):
+class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     """A single shopping trip / receipt."""
 
     __tablename__ = "purchases"
 
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     store_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("stores.id"), nullable=False)
     store_location_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("store_locations.id"))
     receipt_id: Mapped[str] = mapped_column(String(200), nullable=False)
@@ -61,7 +61,7 @@ class Purchase(UUIDPrimaryKeyMixin, Base):
     )
 
 
-class PurchaseItem(UUIDPrimaryKeyMixin, Base):
+class PurchaseItem(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     """Individual line item on a receipt."""
 
     __tablename__ = "purchase_items"

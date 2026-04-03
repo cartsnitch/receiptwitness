@@ -9,7 +9,7 @@ from sqlalchemy import Date, ForeignKey, Index, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from cartsnitch_api.constants import PriceSource
-from cartsnitch_api.models.base import Base, UUIDPrimaryKeyMixin
+from cartsnitch_api.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from cartsnitch_api.models.product import NormalizedProduct
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from cartsnitch_api.models.store import Store
 
 
-class PriceHistory(UUIDPrimaryKeyMixin, Base):
+class PriceHistory(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     """A single price observation for a product at a store on a date."""
 
     __tablename__ = "price_history"

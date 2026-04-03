@@ -1,5 +1,7 @@
 """Scraping routes: trigger sync, check status (proxy to ReceiptWitness)."""
 
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from httpx import HTTPStatusError, RequestError
 
@@ -11,7 +13,7 @@ router = APIRouter(prefix="/scraping", tags=["scraping"])
 
 
 @router.post("/{store_slug}/sync", response_model=SyncTriggerResponse)
-async def trigger_sync(store_slug: str, user_id: str = Depends(get_current_user)):
+async def trigger_sync(store_slug: str, user_id: UUID = Depends(get_current_user)):
     client = ReceiptWitnessClient()
     try:
         result = await client.trigger_sync(str(user_id), store_slug)
@@ -29,7 +31,7 @@ async def trigger_sync(store_slug: str, user_id: str = Depends(get_current_user)
 
 
 @router.get("/status", response_model=list[SyncStatusResponse])
-async def sync_status(user_id: str = Depends(get_current_user)):
+async def sync_status(user_id: UUID = Depends(get_current_user)):
     client = ReceiptWitnessClient()
     try:
         return await client.get_sync_status(str(user_id))

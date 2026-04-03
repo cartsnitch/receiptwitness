@@ -1,6 +1,7 @@
 """Store service — list stores, manage user store account connections."""
 
 import json
+from uuid import UUID
 
 from cryptography.fernet import Fernet
 from sqlalchemy import select
@@ -34,7 +35,7 @@ class StoreService:
             for s in stores
         ]
 
-    async def list_user_stores(self, user_id: str) -> list[dict]:
+    async def list_user_stores(self, user_id: UUID) -> list[dict]:
         from cartsnitch_api.models import UserStoreAccount
 
         result = await self.db.execute(
@@ -59,7 +60,7 @@ class StoreService:
             for a in accounts
         ]
 
-    async def connect_store(self, user_id: str, store_slug: str, credentials: dict | None) -> dict:
+    async def connect_store(self, user_id: UUID, store_slug: str, credentials: dict | None) -> dict:
         from cartsnitch_api.models import Store, UserStoreAccount
 
         result = await self.db.execute(select(Store).where(Store.slug == store_slug))
@@ -106,7 +107,7 @@ class StoreService:
             "sync_status": "active",
         }
 
-    async def disconnect_store(self, user_id: str, store_slug: str) -> None:
+    async def disconnect_store(self, user_id: UUID, store_slug: str) -> None:
         from cartsnitch_api.models import Store, UserStoreAccount
 
         result = await self.db.execute(select(Store).where(Store.slug == store_slug))

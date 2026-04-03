@@ -10,9 +10,9 @@ from decimal import Decimal
 from uuid import UUID
 
 import pytest
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from cartsnitch_api.auth.jwt import decode_token
 from cartsnitch_api.models import (
     Coupon,
     NormalizedProduct,
@@ -26,8 +26,8 @@ from cartsnitch_api.models import (
 # Shared test constants
 ZERO_UUID = "00000000-0000-0000-0000-000000000000"
 BAD_UUID = "not-a-uuid"
-# Fixed anchor date for deterministic tests
-ANCHOR_DATE = date(2026, 3, 15)
+# Anchor date relative to today so coupon validity windows stay in the future
+ANCHOR_DATE = date.today()
 
 
 @pytest.fixture
@@ -126,16 +126,10 @@ async def seed_data(db_engine, auth_headers):
         session.add_all(prices)
         await session.flush()
 
-        # -- Get the user_id from the session token in auth_headers --
-        cookie_str = auth_headers.get("Cookie", "")
-        session_token = cookie_str.split("=", 1)[1] if "=" in cookie_str else ""
-
-        result = await session.execute(
-            text("SELECT user_id FROM sessions WHERE token = :token"),
-            {"token": session_token},
-        )
-        row = result.first()
-        user_id = UUID(row[0])
+        # -- Purchases (need the user_id from the registered test user) --
+        token = auth_headers["Authorization"].split(" ")[1]
+        payload = decode_token(token)
+        user_id = UUID(payload["sub"])
 
         purchase1 = Purchase(
             user_id=user_id,

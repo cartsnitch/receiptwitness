@@ -1,5 +1,7 @@
 """Store routes: list stores, manage user store connections."""
 
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,7 +21,7 @@ async def list_stores(db: AsyncSession = Depends(get_db)):
 
 @router.get("/me/stores", response_model=list[StoreAccountResponse])
 async def list_user_stores(
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = StoreService(db)
@@ -34,7 +36,7 @@ async def list_user_stores(
 async def connect_store(
     store_slug: str,
     body: ConnectStoreRequest,
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = StoreService(db)
@@ -49,7 +51,7 @@ async def connect_store(
 @router.delete("/me/stores/{store_slug}", status_code=status.HTTP_204_NO_CONTENT)
 async def disconnect_store(
     store_slug: str,
-    user_id: str = Depends(get_current_user),
+    user_id: UUID = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = StoreService(db)
