@@ -22,5 +22,13 @@ class ReceiptWitnessSettings(BaseSettings):
     headless: bool = True
     browser_timeout_ms: int = 60000
 
+    # Email notifications (Resend)
+    resend_api_key: str = ""
+    notification_email_from: str = "notifications@cartsnitch.com"
+    notifications_enabled: bool = False
+
+    # Mailgun inbound email webhook
+    mailgun_webhook_signing_key: str = ""
+
 
 settings = ReceiptWitnessSettings()
