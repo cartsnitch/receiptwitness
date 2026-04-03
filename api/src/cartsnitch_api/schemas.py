@@ -1,6 +1,7 @@
 """Pydantic v2 request/response schemas for all API endpoints."""
 
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -19,6 +20,10 @@ class UserResponse(BaseModel):
     email: str
     display_name: str
     created_at: datetime
+
+
+class EmailInAddressResponse(BaseModel):
+    email_address: str
 
 
 # ---------- Stores ----------

@@ -18,6 +18,7 @@ from cartsnitch_api.routes.purchases import router as purchases_router
 from cartsnitch_api.routes.scraping import router as scraping_router
 from cartsnitch_api.routes.shopping import router as shopping_router
 from cartsnitch_api.routes.stores import router as stores_router
+from cartsnitch_api.routes.user import router as user_router
 
 
 @asynccontextmanager
@@ -49,6 +50,7 @@ def create_app() -> FastAPI:
 
     # Data endpoints mounted under /api/v1
     v1_router = APIRouter(prefix="/api/v1")
+    v1_router.include_router(user_router)
     v1_router.include_router(stores_router)
     v1_router.include_router(purchases_router)
     v1_router.include_router(products_router)

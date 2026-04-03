@@ -66,3 +66,14 @@ class AuthService:
 
         await self.db.delete(user)
         await self.db.commit()
+
+    async def get_email_in_address(self, user_id: str) -> str:
+        """Return the per-user email-in address for receipt forwarding."""
+        from cartsnitch_api.models import User
+
+        result = await self.db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        if not user:
+            raise LookupError("User not found")
+
+        return f"{user.email_inbound_token}@email.cartsnitch.com"

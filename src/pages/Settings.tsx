@@ -15,7 +15,7 @@ export function Settings() {
 
   useEffect(() => {
     if (!session?.user) return
-    fetch('/auth/me/email-in-address', {
+    fetch('/api/v1/me/email-in-address', {
       credentials: 'include',
     })
       .then((res) => res.json())
