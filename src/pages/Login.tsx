@@ -31,8 +31,14 @@ export function Login() {
         throw new Error(authError.message ?? 'Sign in failed')
       }
 
-      setAuthenticated(true)
-      navigate('/')
+      // After successful signIn, force a session fetch to confirm the cookie is set
+      // before navigating to the protected route
+      const sessionResult = await authClient.getSession()
+      if (sessionResult.data) {
+        navigate('/')
+      } else {
+        setError('Sign in failed. Please try again.')
+      }
     } catch {
       if (import.meta.env.VITE_MOCK_AUTH === 'true') {
         setAuthenticated(true)
@@ -46,7 +52,7 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4">
       <h1 className="mb-2 text-3xl font-bold text-gray-900">CartSnitch</h1>
       <p className="mb-8 text-sm text-gray-500">Track prices. Save money.</p>
 
@@ -88,10 +94,10 @@ export function Login() {
 
       <p className="mt-6 text-sm text-gray-500">
         Don't have an account?{' '}
-        <Link to="/register" className="text-brand-blue">
+        <Link to="/register" className="text-brand-blue underline">
           Sign up
         </Link>
       </p>
-    </div>
+    </main>
   )
 }

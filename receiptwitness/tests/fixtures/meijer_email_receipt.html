@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meijer Digital Receipt</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+    .receipt-container { background: #ffffff; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #dddddd; }
+    .header { background: #003399; color: #ffffff; padding: 20px; text-align: center; margin: -30px -30px 20px -30px; }
+    .header h1 { margin: 0; font-size: 24px; }
+    .store-info { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #cccccc; padding-bottom: 15px; }
+    .store-info h2 { margin: 0; font-size: 18px; color: #003399; }
+    .receipt-meta { display: flex; justify-content: space-between; font-size: 14px; color: #555555; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th { background: #f0f0f0; text-align: left; padding: 8px 10px; font-size: 13px; color: #333333; }
+    td { padding: 8px 10px; border-bottom: 1px solid #eeeeee; font-size: 14px; }
+    .item-name { font-weight: bold; }
+    .totals { margin-left: auto; width: 250px; }
+    .totals-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+    .totals-row.grand-total { font-weight: bold; font-size: 16px; border-top: 2px solid #333333; padding-top: 10px; margin-top: 4px; }
+    .savings { color: #cc0000; }
+    .footer { text-align: center; font-size: 12px; color: #888888; margin-top: 20px; padding-top: 15px; border-top: 1px solid #dddddd; }
+  </style>
+</head>
+<body>
+  <div class="receipt-container">
+    <div class="header">
+      <h1>MEIJER</h1>
+      <p style="margin: 5px 0 0; font-size: 14px;">Digital Receipt</p>
+    </div>
+
+    <div class="store-info">
+      <h2>Meijer Store #42</h2>
+      <p style="margin: 5px 0 0; font-size: 13px; color: #666;">1555 Lake Drive SE, Grand Rapids, MI 49506</p>
+    </div>
+
+    <div class="receipt-meta">
+      <div>
+        <strong>Date:</strong> March 15, 2026<br />
+        <strong>Time:</strong> 2:34 PM
+      </div>
+      <div style="text-align: right;">
+        <strong>Transaction #</strong><br />
+        TXN-2026-0315-0042
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th style="text-align: center;">Qty</th>
+          <th style="text-align: right;">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="item-name">ORGANIC BANANAS</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$0.69</td>
+        </tr>
+        <tr>
+          <td class="item-name">WHOLE MILK 1 GAL</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$4.29</td>
+        </tr>
+        <tr>
+          <td class="item-name">MEIJER WHOLE GRAIN OAT CEREAL 18OZ</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$4.99</td>
+        </tr>
+        <tr>
+          <td class="item-name">FRESH BROCCOLI CROWN</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$2.49</td>
+        </tr>
+        <tr>
+          <td class="item-name">GROUND BEEF 85/15 1LB</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$6.99</td>
+        </tr>
+        <tr>
+          <td class="item-name">SOURDOUGH BREAD</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$3.99</td>
+        </tr>
+        <tr>
+          <td class="item-name">MEIJER BABY SPINACH 5OZ</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$4.49</td>
+        </tr>
+        <tr>
+          <td class="item-name">LARGE EGGS DOZEN</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">$3.29</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <div class="totals-row">
+        <span>Subtotal</span>
+        <span>$31.22</span>
+      </div>
+      <div class="totals-row">
+        <span>Tax</span>
+        <span>$2.19</span>
+      </div>
+      <div class="totals-row savings">
+        <span>Total Savings</span>
+        <span>-$3.40</span>
+      </div>
+      <div class="totals-row grand-total">
+        <span>Total</span>
+        <span>$33.41</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for shopping at Meijer!</p>
+      <p>Keep your receipt for your records.<br />
+      Questions? Call 1-800-927-8699 or visit meijer.com</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -15,7 +15,7 @@ const mockRoutes: Record<string, (path: string) => unknown> = {
   '/purchases': () => mockPurchases,
   '/products': () => mockProducts,
   '/coupons': () => mockCoupons,
-  '/price-alerts': () => mockAlerts,
+  '/alerts': () => mockAlerts,
 }
 
 function matchMockRoute<T>(path: string): T | null {
@@ -30,7 +30,7 @@ function matchMockRoute<T>(path: string): T | null {
   }
 
   // /products/:id/price-history
-  const priceHistoryMatch = path.match(/^\/products\/(.+)\/price-history$/)
+  const priceHistoryMatch = path.match(/^\/products\/(.+)\/prices$/)
   if (priceHistoryMatch) {
     return getMockPriceHistory(priceHistoryMatch[1]) as T
   }

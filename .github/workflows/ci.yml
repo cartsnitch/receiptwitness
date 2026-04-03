@@ -18,6 +18,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: cartsnitch/cartsnitch
   AUTH_IMAGE_NAME: cartsnitch/auth
+  RECEIPTWITNESS_IMAGE_NAME: cartsnitch/receiptwitness
+  API_IMAGE_NAME: cartsnitch/api
 
 jobs:
   lint:
@@ -46,9 +48,59 @@ jobs:
       - name: Run tests
         run: npx vitest run
 
+  audit:
+    runs-on: runners-cartsnitch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Check for vulnerabilities
+        run: npm audit --audit-level=high
+
+  e2e:
+    runs-on: runners-cartsnitch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+
+  lighthouse:
+    runs-on: runners-cartsnitch
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install Chromium for Lighthouse
+        run: |
+          npm install -g playwright
+          npx playwright install --with-deps chromium
+      - name: Start preview server
+        run: |
+          npm run preview &
+          npx wait-on http://localhost:4173/ --timeout 30000
+      - name: Run Lighthouse CI
+        run: |
+          CHROME_PATH=$(find /home/runner/.cache/ms-playwright -name chrome -type f 2>/dev/null | head -1)
+          npm install -g @lhci/cli
+          CHROME_PATH="$CHROME_PATH" lhci autorun --chrome-flags="--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage"
+
   build-and-push:
     runs-on: runners-cartsnitch
-    needs: [lint, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint, test, e2e]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
     steps:
@@ -72,6 +124,13 @@ jobs:
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "CalVer tag: $VERSION"
+
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -110,7 +169,8 @@ jobs:
 
   build-and-push-auth:
     runs-on: runners-cartsnitch
-    needs: [lint, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint, test, e2e]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
     steps:
@@ -133,6 +193,13 @@ jobs:
             VERSION="${DATE_TAG}.$((BUILD_NUM + 1))"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -161,10 +228,122 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  build-and-push-receiptwitness:
+    runs-on: runners-cartsnitch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint, test]
+    outputs:
+      calver_tag: ${{ steps.calver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate CalVer tag
+        id: calver
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          DATE_TAG=$(date -u +%Y.%m.%d)
+          EXISTING=$(git tag -l "v${DATE_TAG}*" | sort -V | tail -1)
+          if [ -z "$EXISTING" ]; then VERSION="$DATE_TAG"
+          elif [ "$EXISTING" = "v${DATE_TAG}" ]; then VERSION="${DATE_TAG}.2"
+          else BUILD_NUM=$(echo "$EXISTING" | sed "s/v${DATE_TAG}\.//"); VERSION="${DATE_TAG}.$((BUILD_NUM + 1))"; fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.RECEIPTWITNESS_IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=${{ steps.calver.outputs.version }},enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push receiptwitness image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./receiptwitness/Dockerfile
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-api:
+    runs-on: runners-cartsnitch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint, test]
+    outputs:
+      calver_tag: ${{ steps.calver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate CalVer tag
+        id: calver
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          DATE_TAG=$(date -u +%Y.%m.%d)
+          EXISTING=$(git tag -l "v${DATE_TAG}*" | sort -V | tail -1)
+          if [ -z "$EXISTING" ]; then VERSION="$DATE_TAG"
+          elif [ "$EXISTING" = "v${DATE_TAG}" ]; then VERSION="${DATE_TAG}.2"
+          else BUILD_NUM=$(echo "$EXISTING" | sed "s/v${DATE_TAG}\.//"); VERSION="${DATE_TAG}.$((BUILD_NUM + 1))"; fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (API)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=${{ steps.calver.outputs.version }},enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push API Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./api/Dockerfile
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
   deploy-dev:
     runs-on: runners-cartsnitch
-    needs: [build-and-push, build-and-push-auth]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-and-push, build-and-push-auth, build-and-push-receiptwitness, build-and-push-api]
+    if: always() && !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Generate GitHub App token
         id: app-token
@@ -189,11 +368,29 @@ jobs:
       - name: Install kustomize
         uses: imranismail/setup-kustomize@v2
 
-      - name: Update dev overlay image tag
+      - name: Update frontend image tag
+        if: needs.build-and-push.result == 'success'
         run: |
           cd infra/apps/overlays/dev
           kustomize edit set image ghcr.io/cartsnitch/cartsnitch:${{ needs.build-and-push.outputs.calver_tag }}
+
+      - name: Update auth image tag
+        if: needs.build-and-push-auth.result == 'success'
+        run: |
+          cd infra/apps/overlays/dev
           kustomize edit set image ghcr.io/cartsnitch/auth:${{ needs.build-and-push-auth.outputs.calver_tag }}
+
+      - name: Update receiptwitness image tag
+        if: needs.build-and-push-receiptwitness.result == 'success'
+        run: |
+          cd infra/apps/overlays/dev
+          kustomize edit set image ghcr.io/cartsnitch/receiptwitness:${{ needs.build-and-push-receiptwitness.outputs.calver_tag }}
+
+      - name: Update api image tag
+        if: needs.build-and-push-api.result == 'success'
+        run: |
+          cd infra/apps/overlays/dev
+          kustomize edit set image ghcr.io/cartsnitch/api:${{ needs.build-and-push-api.outputs.calver_tag }}
 
       - name: Commit and push to infra
         run: |
@@ -201,5 +398,5 @@ jobs:
           git config user.name "cartsnitch-ci[bot]"
           git config user.email "cartsnitch-ci[bot]@users.noreply.github.com"
           git add apps/overlays/dev/kustomization.yaml
-          git commit -m "ci(dev): update cartsnitch and auth images to ${{ needs.build-and-push.outputs.calver_tag }}"
+          git commit -m "ci(dev): update cartsnitch, auth, receiptwitness, and api images"
           git push origin main

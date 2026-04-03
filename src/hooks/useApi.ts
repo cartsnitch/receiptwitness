@@ -35,7 +35,7 @@ export function useProduct(id: string) {
 export function usePriceHistory(productId: string) {
   return useQuery({
     queryKey: ['priceHistory', productId],
-    queryFn: () => api.get<PriceHistory[]>(`/products/${productId}/price-history`),
+    queryFn: () => api.get<PriceHistory[]>(`/products/${productId}/prices`),
     enabled: !!productId,
   })
 }
@@ -50,6 +50,6 @@ export function useCoupons() {
 export function usePriceAlerts() {
   return useQuery({
     queryKey: ['priceAlerts'],
-    queryFn: () => api.get<PriceAlert[]>('/price-alerts'),
+    queryFn: () => api.get<PriceAlert[]>('/alerts'),
   })
 }
