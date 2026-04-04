@@ -72,6 +72,56 @@ async def test_delete_me(client, auth_headers):
 
 
 @pytest.mark.asyncio
+async def test_get_me_compound_cookie(client, db_engine):
+    """Compound cookie value (token.sessionId) must be parsed to extract the token part."""
+    from tests.conftest import _create_test_user_and_session
+
+    _, session_token = await _create_test_user_and_session(
+        client, db_engine, email="compound@example.com", display_name="Compound User"
+    )
+    compound = f"{session_token}.B0atkJCFxK1rZlwWPMK97nVO2LnyDun7"
+    resp = await client.get(
+        "/auth/me",
+        headers={"Cookie": f"better-auth.session_token={compound}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["email"] == "compound@example.com"
+
+
+@pytest.mark.asyncio
+async def test_get_me_raw_token_cookie(client, db_engine):
+    """Raw token (no dot) in cookie must still work — regression guard."""
+    from tests.conftest import _create_test_user_and_session
+
+    _, session_token = await _create_test_user_and_session(
+        client, db_engine, email="rawcookie@example.com", display_name="Raw Cookie User"
+    )
+    resp = await client.get(
+        "/auth/me",
+        headers={"Cookie": f"better-auth.session_token={session_token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["email"] == "rawcookie@example.com"
+
+
+@pytest.mark.asyncio
+async def test_get_me_compound_bearer(client, db_engine):
+    """Compound Bearer token (token.sessionId) must be parsed to extract the token part."""
+    from tests.conftest import _create_test_user_and_session
+
+    _, session_token = await _create_test_user_and_session(
+        client, db_engine, email="compoundbearer@example.com", display_name="Compound Bearer User"
+    )
+    compound = f"{session_token}.B0atkJCFxK1rZlwWPMK97nVO2LnyDun7"
+    resp = await client.get(
+        "/auth/me",
+        headers={"Authorization": f"Bearer {compound}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["email"] == "compoundbearer@example.com"
+
+
+@pytest.mark.asyncio
 async def test_expired_session_rejected(client, db_engine):
     """Expired sessions must be rejected."""
     import secrets
