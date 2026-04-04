@@ -1,13 +1,16 @@
 import base64
 
-from pydantic import model_validator
+from pydantic import AliasChoices, Field, model_validator
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     model_config = {"env_prefix": "CARTSNITCH_"}
 
-    database_url: str = "postgresql+asyncpg://cartsnitch:cartsnitch@localhost:5432/cartsnitch"
+    database_url: str = Field(
+        default="postgresql+asyncpg://cartsnitch:cartsnitch@localhost:5432/cartsnitch",
+        validation_alias=AliasChoices("CARTSNITCH_DATABASE_URL", "DATABASE_URL"),
+    )
     redis_url: str = "redis://localhost:6379/0"
 
     jwt_secret_key: str = "change-me-in-production"
@@ -47,6 +50,13 @@ class Settings(BaseSettings):
                 "'from cryptography.fernet import Fernet; "
                 "print(Fernet.generate_key().decode())'"
             ) from None
+        return self
+
+    @model_validator(mode="after")
+    def normalize_database_url(self):
+        """Normalize postgresql:// → postgresql+asyncpg:// for the asyncpg driver."""
+        if self.database_url.startswith("postgresql://"):
+            self.database_url = self.database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
         return self
 
 
