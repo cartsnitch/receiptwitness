@@ -71,11 +71,14 @@ async def get_current_user(
     # 1. Check session cookie — prefer __Secure- variant (HTTPS) over plain (HTTP dev)
     cookie_token = request.cookies.get(SECURE_SESSION_COOKIE_NAME) or request.cookies.get(SESSION_COOKIE_NAME)
     if cookie_token:
-        token = cookie_token
+        # Better-Auth cookie format is "token.sessionId" — extract just the token part
+        token = cookie_token.split(".")[0] if "." in cookie_token else cookie_token
 
     # 2. Fall back to Bearer header
     if not token and credentials:
-        token = credentials.credentials
+        # Callers might pass the compound value here too
+        raw = credentials.credentials
+        token = raw.split(".")[0] if "." in raw else raw
 
     if not token:
         raise HTTPException(
