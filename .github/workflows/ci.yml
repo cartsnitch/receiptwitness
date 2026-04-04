@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev, uat]
   pull_request:
-    branches: [main]
+    branches: [main, dev, uat]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -99,10 +99,11 @@ jobs:
 
   build-and-push:
     runs-on: runners-cartsnitch
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push'
     needs: [lint, test, e2e]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
+      sha_tag: sha-${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -126,14 +127,14 @@ jobs:
           echo "CalVer tag: $VERSION"
 
       - name: Log in to Docker Hub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -154,7 +155,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           target: prod
@@ -169,10 +170,11 @@ jobs:
 
   build-and-push-auth:
     runs-on: runners-cartsnitch
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push'
     needs: [lint, test, e2e]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
+      sha_tag: sha-${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -195,14 +197,14 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Log in to Docker Hub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -224,16 +226,17 @@ jobs:
         with:
           context: ./auth
           file: ./auth/Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-receiptwitness:
     runs-on: runners-cartsnitch
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push'
     needs: [lint, test]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
+      sha_tag: sha-${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -251,14 +254,14 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Log in to Docker Hub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -280,16 +283,17 @@ jobs:
         with:
           context: .
           file: ./receiptwitness/Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-api:
     runs-on: runners-cartsnitch
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push'
     needs: [lint, test]
     outputs:
       calver_tag: ${{ steps.calver.outputs.version }}
+      sha_tag: sha-${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -307,14 +311,14 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Log in to Docker Hub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -336,14 +340,14 @@ jobs:
         with:
           context: ./api
           file: ./api/Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy-dev:
     runs-on: runners-cartsnitch
     needs: [build-and-push, build-and-push-auth, build-and-push-receiptwitness, build-and-push-api]
-    if: always() && !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always() && !cancelled() && github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
     steps:
       - name: Generate GitHub App token
         id: app-token
@@ -368,29 +372,65 @@ jobs:
       - name: Install kustomize
         uses: imranismail/setup-kustomize@v2
 
+      - name: Determine image tag for frontend
+        id: frontend_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update frontend image tag
         if: needs.build-and-push.result == 'success'
         run: |
           cd infra/apps/overlays/dev
-          kustomize edit set image ghcr.io/cartsnitch/cartsnitch:${{ needs.build-and-push.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/cartsnitch:${{ steps.frontend_tag.outputs.tag }}
+
+      - name: Determine image tag for auth
+        id: auth_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push-auth.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push-auth.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Update auth image tag
         if: needs.build-and-push-auth.result == 'success'
         run: |
           cd infra/apps/overlays/dev
-          kustomize edit set image ghcr.io/cartsnitch/auth:${{ needs.build-and-push-auth.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/auth:${{ steps.auth_tag.outputs.tag }}
+
+      - name: Determine image tag for receiptwitness
+        id: receiptwitness_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push-receiptwitness.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push-receiptwitness.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Update receiptwitness image tag
         if: needs.build-and-push-receiptwitness.result == 'success'
         run: |
           cd infra/apps/overlays/dev
-          kustomize edit set image ghcr.io/cartsnitch/receiptwitness:${{ needs.build-and-push-receiptwitness.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/receiptwitness:${{ steps.receiptwitness_tag.outputs.tag }}
+
+      - name: Determine image tag for api
+        id: api_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push-api.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push-api.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Update api image tag
         if: needs.build-and-push-api.result == 'success'
         run: |
           cd infra/apps/overlays/dev
-          kustomize edit set image ghcr.io/cartsnitch/api:${{ needs.build-and-push-api.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/api:${{ steps.api_tag.outputs.tag }}
 
       - name: Commit and push to infra
         run: |
@@ -405,7 +445,7 @@ jobs:
   deploy-uat:
     runs-on: runners-cartsnitch
     needs: [build-and-push, build-and-push-auth, build-and-push-receiptwitness, build-and-push-api]
-    if: always() && !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always() && !cancelled() && github.event_name == 'push' && (github.ref == 'refs/heads/uat' || github.ref == 'refs/heads/main')
     steps:
       - name: Generate GitHub App token
         id: app-token
@@ -430,29 +470,65 @@ jobs:
       - name: Install kustomize
         uses: imranismail/setup-kustomize@v2
 
+      - name: Determine image tag for frontend
+        id: frontend_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update frontend image tag
         if: needs.build-and-push.result == 'success'
         run: |
           cd infra/apps/overlays/uat
-          kustomize edit set image ghcr.io/cartsnitch/cartsnitch:${{ needs.build-and-push.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/cartsnitch:${{ steps.frontend_tag.outputs.tag }}
+
+      - name: Determine image tag for auth
+        id: auth_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push-auth.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push-auth.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Update auth image tag
         if: needs.build-and-push-auth.result == 'success'
         run: |
           cd infra/apps/overlays/uat
-          kustomize edit set image ghcr.io/cartsnitch/auth:${{ needs.build-and-push-auth.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/auth:${{ steps.auth_tag.outputs.tag }}
+
+      - name: Determine image tag for receiptwitness
+        id: receiptwitness_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push-receiptwitness.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push-receiptwitness.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Update receiptwitness image tag
         if: needs.build-and-push-receiptwitness.result == 'success'
         run: |
           cd infra/apps/overlays/uat
-          kustomize edit set image ghcr.io/cartsnitch/receiptwitness:${{ needs.build-and-push-receiptwitness.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/receiptwitness:${{ steps.receiptwitness_tag.outputs.tag }}
+
+      - name: Determine image tag for api
+        id: api_tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=${{ needs.build-and-push-api.outputs.calver_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ needs.build-and-push-api.outputs.sha_tag }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Update api image tag
         if: needs.build-and-push-api.result == 'success'
         run: |
           cd infra/apps/overlays/uat
-          kustomize edit set image ghcr.io/cartsnitch/api:${{ needs.build-and-push-api.outputs.calver_tag }}
+          kustomize edit set image ghcr.io/cartsnitch/api:${{ steps.api_tag.outputs.tag }}
 
       - name: Commit and push to infra
         run: |
