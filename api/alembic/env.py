@@ -6,7 +6,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from cartsnitch_api.models.base import Base  # noqa: F401 — imports all models for autogenerate
+from cartsnitch_api.models import Base  # noqa: F401 — imports all models for autogenerate
 
 config = context.config
 if config.config_file_name is not None:
