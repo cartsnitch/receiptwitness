@@ -53,6 +53,7 @@ def run_migrations_online() -> None:
         # checkfirst=True ensures this is a no-op on existing databases.
         try:
             Base.metadata.create_all(bind=connection, checkfirst=True)
+            connection.commit()
         except Exception as exc:
             import logging
             logging.getLogger("alembic.env").warning(
