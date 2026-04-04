@@ -95,5 +95,6 @@ export const auth = betterAuth({
     "https://cartsnitch.com",
     "https://cartsnitch.farh.net",
     "https://cartsnitch.dev.farh.net",
+    "https://cartsnitch.uat.farh.net",
   ],
 });
