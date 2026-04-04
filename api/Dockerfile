@@ -16,6 +16,8 @@ WORKDIR /app
 RUN adduser --system --group --uid 1000 app
 COPY --from=build /install /usr/local
 COPY src/ ./src/
+COPY alembic.ini ./
+COPY alembic/ ./alembic/
 
 USER 1000
 EXPOSE 8000
