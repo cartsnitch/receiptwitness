@@ -4,6 +4,7 @@ Session-based auth: tests create users and sessions directly in the DB,
 matching the Better-Auth session validation flow.
 """
 
+import hashlib
 import secrets
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -136,12 +137,14 @@ async def client(db_engine):
 async def _create_test_user_and_session(client: AsyncClient, db_engine, **user_overrides) -> tuple[dict, str]:
     """Create a test user and a valid session directly in the DB.
 
-    Returns (user_dict, session_token).
+    Returns (user_dict, session_token).  Better-Auth v1.2+ stores SHA-256
+    hashed tokens in the DB, so the token is hashed before insertion.
     """
     user_id = str(uuid.uuid4())
     email = user_overrides.get("email", "test@example.com")
     display_name = user_overrides.get("display_name", "Test User")
     session_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(session_token.encode()).hexdigest()
     session_id = str(uuid.uuid4())
     now = datetime.now(UTC).isoformat()
     expires = (datetime.now(UTC) + timedelta(days=7)).isoformat()
@@ -169,7 +172,7 @@ async def _create_test_user_and_session(client: AsyncClient, db_engine, **user_o
             ),
             {
                 "id": session_id,
-                "token": session_token,
+                "token": token_hash,
                 "user_id": user_id,
                 "expires_at": expires,
                 "created_at": now,
