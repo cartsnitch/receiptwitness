@@ -19,6 +19,8 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 # Better-Auth session cookie name
 SESSION_COOKIE_NAME = "better-auth.session_token"
+# Secure prefix used by better-auth on HTTPS deployments
+SECURE_SESSION_COOKIE_NAME = "__Secure-better-auth.session_token"
 
 
 async def _validate_session_token(token: str, db: AsyncSession) -> str:
@@ -65,8 +67,8 @@ async def get_current_user(
     """
     token: str | None = None
 
-    # 1. Check session cookie
-    cookie_token = request.cookies.get(SESSION_COOKIE_NAME)
+    # 1. Check session cookie — prefer __Secure- variant (HTTPS) over plain (HTTP dev)
+    cookie_token = request.cookies.get(SECURE_SESSION_COOKIE_NAME) or request.cookies.get(SESSION_COOKIE_NAME)
     if cookie_token:
         token = cookie_token
 
