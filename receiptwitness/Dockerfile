@@ -5,7 +5,7 @@ WORKDIR /app
 
 # build-essential and libpq-dev are needed to compile any C-extension wheels
 # (e.g. psycopg2 fallback).  No git needed — common/ is copied from the repo root.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     libpq-dev \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
@@ -25,7 +25,7 @@ FROM python:3.12-slim AS prod
 WORKDIR /app
 
 # Install Playwright system dependencies for Chromium
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     libnss3 \
     libatk1.0-0 \
     libatk-bridge2.0-0 \

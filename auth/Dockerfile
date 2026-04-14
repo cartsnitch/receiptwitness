@@ -1,4 +1,5 @@
 FROM node:22-alpine AS builder
+RUN apk update && apk upgrade --no-cache
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
@@ -7,6 +8,7 @@ COPY src/ src/
 RUN npm run build
 
 FROM node:22-alpine
+RUN apk update && apk upgrade --no-cache
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package.json package-lock.json* ./
