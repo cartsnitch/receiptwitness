@@ -71,3 +71,97 @@ async def test_public_inflation(client, public_data):
     data = resp.json()
     assert "categories" in data
     assert "cartsnitch_index" in data
+
+
+@pytest.mark.asyncio
+async def test_trend_invalid_uuid(client):
+    resp = await client.get("/public/trends/not-a-uuid")
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_trend_days_zero(client, public_data):
+    pid = str(public_data["product"].id)
+    resp = await client.get(f"/public/trends/{pid}?days=0")
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_trend_days_negative(client, public_data):
+    pid = str(public_data["product"].id)
+    resp = await client.get(f"/public/trends/{pid}?days=-1")
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_trend_days_over_max(client, public_data):
+    pid = str(public_data["product"].id)
+    resp = await client.get(f"/public/trends/{pid}?days=999")
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_trend_days_valid(client, public_data):
+    pid = str(public_data["product"].id)
+    resp = await client.get(f"/public/trends/{pid}?days=30")
+    assert resp.status_code == 200
+    assert "product_name" in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_store_comparison_empty_list(client):
+    resp = await client.get("/public/store-comparison")
+    assert resp.status_code == 400
+    assert "detail" in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_store_comparison_category_xss(client, public_data):
+    pid = str(public_data["product"].id)
+    resp = await client.get(
+        f"/public/store-comparison?product_ids={pid}&category=<script>alert(1)</script>"
+    )
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_store_comparison_category_sql_injection(client, public_data):
+    pid = str(public_data["product"].id)
+    resp = await client.get(f"/public/store-comparison?product_ids={pid}&category='; DROP TABLE--")
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_inflation_invalid_period(client, public_data):
+    resp = await client.get("/public/inflation?period=10years")
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_inflation_valid_periods(client, public_data):
+    for period in ["all-time", "1y", "6m", "3m", "1m"]:
+        resp = await client.get(f"/public/inflation?period={period}")
+        assert resp.status_code == 200, f"period={period} failed"
+
+
+@pytest.mark.asyncio
+async def test_inflation_category_too_long(client, public_data):
+    long_category = "x" * 200
+    resp = await client.get(f"/public/inflation?category={long_category}")
+    assert resp.status_code == 422
+    assert "detail" in resp.json()
+    assert "stack" not in resp.json()
