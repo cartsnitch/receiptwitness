@@ -4,16 +4,22 @@ import pg from "pg";
 
 const { Pool } = pg;
 
-const pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL ??
-    "postgresql://cartsnitch:cartsnitch@localhost:5432/cartsnitch",
-});
-
 const secret = process.env.BETTER_AUTH_SECRET;
 if (!secret) {
   throw new Error("BETTER_AUTH_SECRET environment variable is required");
 }
+
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  console.warn(
+    "WARNING: DATABASE_URL is not set — using default localhost connection. " +
+    "Set DATABASE_URL for production deployments."
+  );
+}
+
+const pool = new Pool({
+  connectionString: databaseUrl ?? "postgresql://cartsnitch:cartsnitch@localhost:5432/cartsnitch",
+});
 
 export const auth = betterAuth({
   database: pool,
