@@ -4,6 +4,7 @@ Uses in-memory sliding window as fallback, Redis/DragonflyDB when available.
 Per-IP limiting on public endpoints, per-token limiting on authenticated endpoints.
 """
 
+import hashlib
 import time
 from collections import defaultdict
 from threading import Lock
@@ -71,8 +72,8 @@ def _get_rate_limit_key(request: Request) -> tuple[str, _SlidingWindowCounter]:
     auth_header = request.headers.get("authorization", "")
     if auth_header.startswith("Bearer "):
         token = auth_header[7:]
-        # Use last 16 chars of token as key to avoid storing full tokens
-        return f"token:{token[-16:]}", _auth_limiter
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        return f"token:{token_hash}", _auth_limiter
 
     # Fallback to IP for unauthenticated non-public endpoints
     return f"ip:{_get_client_ip(request)}", _public_limiter

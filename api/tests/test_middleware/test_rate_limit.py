@@ -1,8 +1,10 @@
 """Tests for rate limiting middleware."""
 
+from unittest.mock import MagicMock
+
 import pytest
 
-from cartsnitch_api.middleware.rate_limit import _SlidingWindowCounter
+from cartsnitch_api.middleware.rate_limit import _SlidingWindowCounter, _get_rate_limit_key
 
 
 class TestSlidingWindowCounter:
@@ -53,3 +55,32 @@ async def test_health_skips_rate_limit(client):
     resp = await client.get("/health")
     assert resp.status_code == 200
     assert "x-ratelimit-limit" not in resp.headers
+
+
+class TestGetRateLimitKey:
+    def _make_request(self, auth_header: str = "") -> MagicMock:
+        req = MagicMock()
+        req.url.path = "/purchases"
+        req.headers = {"authorization": auth_header} if auth_header else {}
+        return req
+
+    def test_distinct_tokens_produce_distinct_keys(self):
+        req1 = self._make_request("Bearer token_alpha_12345")
+        req2 = self._make_request("Bearer token_beta_67890")
+        key1, _ = _get_rate_limit_key(req1)
+        key2, _ = _get_rate_limit_key(req2)
+        assert key1 != key2
+
+    def test_same_token_produces_same_key(self):
+        req1 = self._make_request("Bearer same_token_value_abc")
+        req2 = self._make_request("Bearer same_token_value_abc")
+        key1, _ = _get_rate_limit_key(req1)
+        key2, _ = _get_rate_limit_key(req2)
+        assert key1 == key2
+
+    def test_key_does_not_contain_raw_token_suffix(self):
+        raw_token = "my_secret_jwt_token_xyz"
+        req = self._make_request(f"Bearer {raw_token}")
+        key, _ = _get_rate_limit_key(req)
+        assert raw_token[-16:] not in key
+        assert raw_token not in key
