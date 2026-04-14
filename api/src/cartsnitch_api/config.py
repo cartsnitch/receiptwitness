@@ -13,14 +13,13 @@ class Settings(BaseSettings):
     )
     redis_url: str = "redis://localhost:6379/0"
 
-    jwt_secret_key: str = "change-me-in-production"
+    jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 15
     jwt_refresh_token_expire_days: int = 7
 
-    service_key: str = "change-me-in-production"
-    # Valid Fernet key for local dev — MUST be overridden in production
-    fernet_key: str = "7reF42nmTwbdN21PBoubGp7h_FU8qSimstmlaMLoRK8="
+    service_key: str
+    fernet_key: str
 
     auth_service_url: str = "http://auth:3001"
 
@@ -35,9 +34,26 @@ class Settings(BaseSettings):
     rate_limit_window_seconds: int = 60
     rate_limit_enabled: bool = True
 
+    _PLACEHOLDER_VALUES = {"change-me-in-production"}
+
     @model_validator(mode="after")
-    def validate_fernet_key(self):
-        """Validate fernet_key is a valid 32-byte url-safe base64 key at startup."""
+    def validate_secrets(self):
+        if not self.jwt_secret_key or self.jwt_secret_key in self._PLACEHOLDER_VALUES:
+            raise ValueError(
+                "CARTSNITCH_JWT_SECRET_KEY must be set to a secure value. "
+                'Generate one with: python -c "import secrets; print(secrets.token_urlsafe(32))"'
+            )
+        if not self.service_key or self.service_key in self._PLACEHOLDER_VALUES:
+            raise ValueError(
+                "CARTSNITCH_SERVICE_KEY must be set to a secure value. "
+                'Generate one with: python -c "import secrets; print(secrets.token_urlsafe(32))"'
+            )
+        if not self.fernet_key or self.fernet_key in self._PLACEHOLDER_VALUES:
+            raise ValueError(
+                "CARTSNITCH_FERNET_KEY must be set to a valid Fernet key. "
+                "Generate one with: python -c "
+                "'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'"
+            )
         try:
             decoded = base64.urlsafe_b64decode(self.fernet_key.encode())
             if len(decoded) != 32:

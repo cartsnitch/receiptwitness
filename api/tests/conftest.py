@@ -19,6 +19,25 @@ from cartsnitch_api.database import get_db
 from cartsnitch_api.main import create_app
 from cartsnitch_api.models import Base
 
+TEST_JWT_SECRET = secrets.token_urlsafe(32)
+TEST_SERVICE_KEY = secrets.token_urlsafe(32)
+TEST_FERNET_KEY = "7reF42nmTwbdN21PBoubGp7h_FU8qSimstmlaMLoRK8="
+
+
+@pytest.fixture(autouse=True)
+def setup_test_settings():
+    original_jwt = cartsnitch_settings.jwt_secret_key
+    original_service = cartsnitch_settings.service_key
+    original_fernet = cartsnitch_settings.fernet_key
+    cartsnitch_settings.jwt_secret_key = TEST_JWT_SECRET
+    cartsnitch_settings.service_key = TEST_SERVICE_KEY
+    cartsnitch_settings.fernet_key = TEST_FERNET_KEY
+    yield
+    cartsnitch_settings.jwt_secret_key = original_jwt
+    cartsnitch_settings.service_key = original_service
+    cartsnitch_settings.fernet_key = original_fernet
+
+
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 
@@ -60,7 +79,8 @@ async def db_engine():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         # Create Better-Auth tables (not managed by SQLAlchemy models)
-        await conn.execute(text("""
+        await conn.execute(
+            text("""
             CREATE TABLE IF NOT EXISTS sessions (
                 id TEXT PRIMARY KEY,
                 token TEXT NOT NULL UNIQUE,
@@ -71,8 +91,10 @@ async def db_engine():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
             )
-        """))
-        await conn.execute(text("""
+        """)
+        )
+        await conn.execute(
+            text("""
             CREATE TABLE IF NOT EXISTS accounts (
                 id TEXT PRIMARY KEY,
                 user_id TEXT NOT NULL,
@@ -88,8 +110,10 @@ async def db_engine():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
             )
-        """))
-        await conn.execute(text("""
+        """)
+        )
+        await conn.execute(
+            text("""
             CREATE TABLE IF NOT EXISTS verifications (
                 id TEXT PRIMARY KEY,
                 identifier TEXT NOT NULL,
@@ -98,7 +122,8 @@ async def db_engine():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
             )
-        """))
+        """)
+        )
 
     yield engine
 
@@ -133,7 +158,9 @@ async def client(db_engine):
     app.dependency_overrides.clear()
 
 
-async def _create_test_user_and_session(client: AsyncClient, db_engine, **user_overrides) -> tuple[dict, str]:
+async def _create_test_user_and_session(
+    client: AsyncClient, db_engine, **user_overrides
+) -> tuple[dict, str]:
     """Create a test user and a valid session directly in the DB.
 
     Returns (user_dict, session_token).  Better-Auth stores the raw token
