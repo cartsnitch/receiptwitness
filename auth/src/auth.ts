@@ -17,7 +17,7 @@ if (!databaseUrl) {
   );
 }
 
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: databaseUrl ?? "postgresql://cartsnitch:cartsnitch@localhost:5432/cartsnitch",
 });
 
