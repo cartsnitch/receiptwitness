@@ -69,7 +69,9 @@ async def get_current_user(
     token: str | None = None
 
     # 1. Check session cookie — prefer __Secure- variant (HTTPS) over plain (HTTP dev)
-    cookie_token = request.cookies.get(SECURE_SESSION_COOKIE_NAME) or request.cookies.get(SESSION_COOKIE_NAME)
+    cookie_token = request.cookies.get(SECURE_SESSION_COOKIE_NAME) or request.cookies.get(
+        SESSION_COOKIE_NAME
+    )
     if cookie_token:
         # Better-Auth cookie format is "token.sessionId" — extract just the token part
         token = cookie_token.split(".")[0] if "." in cookie_token else cookie_token
@@ -86,7 +88,9 @@ async def get_current_user(
             detail="Authentication required",
         )
 
-    return await _validate_session_token(token, db)
+    user_id = await _validate_session_token(token, db)
+    request.state.user_id = user_id
+    return user_id
 
 
 async def verify_service_key(x_service_key: str = Header()) -> None:
