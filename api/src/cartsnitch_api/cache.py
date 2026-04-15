@@ -47,5 +47,30 @@ class CacheClient:
             return
         await self._client.delete(key)
 
+    async def invalidate_price_cache(self, product_id: str) -> None:
+        """Invalidate all price-related cache entries for a product."""
+        if not self._client:
+            return
+        pattern = f"price:*:{product_id}"
+        await self._delete_pattern(pattern)
+
+    async def invalidate_product_cache(self, product_id: str) -> None:
+        """Invalidate the product detail cache entry."""
+        if not self._client:
+            return
+        await self._client.delete(f"product:{product_id}")
+
+    async def _delete_pattern(self, pattern: str) -> None:
+        """Delete all keys matching a pattern using SCAN."""
+        if not self._client:
+            return
+        cursor = 0
+        while True:
+            cursor, keys = await self._client.scan(cursor=cursor, match=pattern, count=100)
+            if keys:
+                await self._client.delete(*keys)
+            if cursor == 0:
+                break
+
 
 cache_client = CacheClient()
