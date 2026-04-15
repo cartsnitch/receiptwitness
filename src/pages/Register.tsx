@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { authClient } from '../lib/auth-client.ts'
 
 export function Register() {
@@ -11,7 +11,6 @@ export function Register() {
   const [registrationComplete, setRegistrationComplete] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
   const [resendMessage, setResendMessage] = useState('')
-  const navigate = useNavigate()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
