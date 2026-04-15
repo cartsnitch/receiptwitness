@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { mockAuthRoutes, mockSessionDelayed } from '../fixtures';
 
 test.describe('J8: Unauthenticated Access', () => {
   test('redirects /dashboard (/) to /login when not authenticated', async ({ page }) => {
-    // No session cookie — start fresh
-    await page.context().clearCookies();
+    await mockAuthRoutes(page, false);
     await page.goto('/');
 
     await expect(page).toHaveURL(/\/login/);
@@ -11,7 +11,7 @@ test.describe('J8: Unauthenticated Access', () => {
   });
 
   test('redirects /purchases to /login when not authenticated', async ({ page }) => {
-    await page.context().clearCookies();
+    await mockAuthRoutes(page, false);
     await page.goto('/purchases');
 
     await expect(page).toHaveURL(/\/login/);
@@ -19,7 +19,7 @@ test.describe('J8: Unauthenticated Access', () => {
   });
 
   test('redirects /products to /login when not authenticated', async ({ page }) => {
-    await page.context().clearCookies();
+    await mockAuthRoutes(page, false);
     await page.goto('/products');
 
     await expect(page).toHaveURL(/\/login/);
@@ -27,7 +27,7 @@ test.describe('J8: Unauthenticated Access', () => {
   });
 
   test('redirects /coupons to /login when not authenticated', async ({ page }) => {
-    await page.context().clearCookies();
+    await mockAuthRoutes(page, false);
     await page.goto('/coupons');
 
     await expect(page).toHaveURL(/\/login/);
@@ -35,15 +35,9 @@ test.describe('J8: Unauthenticated Access', () => {
   });
 
   test('shows loading spinner while auth session is pending', async ({ page }) => {
-    // Intercept but don't respond — session stays pending
-    await page.context().clearCookies();
-    await page.request.fetch('/api/auth/session', {
-      method: 'GET',
-    });
-
-    // Just navigate to a protected route — ProtectedRoute will show spinner while session is pending
+    await mockSessionDelayed(page, 3000);
     await page.goto('/purchases');
-    // Spinner is visible briefly; once resolved, should redirect to login
+    await expect(page.locator('.animate-spin')).toBeVisible({ timeout: 2000 });
     await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
   });
 });

@@ -79,21 +79,21 @@ function AuthenticatedDashboard({ userName }: { userName: string }) {
         <div className="rounded-xl bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-gray-500">Watching</p>
           <p className="mt-1 text-2xl font-bold text-gray-900">{watchingAlerts.length}</p>
-          <p className="text-xs text-gray-400">price alerts</p>
+          <p className="text-xs text-gray-600">price alerts</p>
         </div>
         <div className="rounded-xl bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-gray-500">This Month</p>
           <p className="mt-1 text-2xl font-bold text-gray-900">
             ${recentPurchases.reduce((sum, p) => sum + p.total, 0).toFixed(0)}
           </p>
-          <p className="text-xs text-gray-400">grocery spend</p>
+          <p className="text-xs text-gray-600">grocery spend</p>
         </div>
       </div>
 
       {/* Price trend sparklines */}
       <section className="mt-6">
         <h2 className="mb-3 text-lg font-semibold text-gray-700">Price Trends</h2>
-        <div className="rounded-xl bg-white p-4 shadow-sm text-center text-sm text-gray-400">
+        <div className="rounded-xl bg-white p-4 shadow-sm text-center text-sm text-gray-600">
           Connect a store to see price trends
         </div>
       </section>
