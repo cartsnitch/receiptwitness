@@ -37,7 +37,7 @@ export const auth = betterAuth({
     maxPasswordLength: 128,
     password: {
       hash: async (password: string) => {
-        return bcrypt.hash(password, 10);
+        return bcrypt.hash(password, 12);
       },
       verify: async (data: { hash: string; password: string }) => {
         return bcrypt.compare(data.password, data.hash);
