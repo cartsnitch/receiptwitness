@@ -5,12 +5,14 @@ Matches products across retailers by:
 2. Fuzzy name matching via token-based Jaccard similarity (lower confidence)
 """
 
+import json
 import re
 from dataclasses import dataclass
 from enum import StrEnum
 
 from cartsnitch_common.models.product import NormalizedProduct
-from sqlalchemy import select
+from sqlalchemy import cast, func, select, String
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
 
 
@@ -96,17 +98,24 @@ def jaccard_similarity(a: str, b: str) -> float:
 def match_by_upc(session: Session, upc: str) -> MatchResult | None:
     """Find a normalized product by exact UPC match.
 
-    Loads products with upc_variants and checks membership in Python
-    for cross-database compatibility (works on both PostgreSQL and SQLite).
+    Uses PostgreSQL JSONB containment (@>) for production efficiency.
+    Falls back to LIKE on SQLite for test compatibility.
     """
-    # TODO: Use PostgreSQL JSON containment query (@>) for production.
-    # Current approach loads all products into memory — acceptable for tests
-    # and small datasets, but will not scale.
-    stmt = select(NormalizedProduct).where(NormalizedProduct.upc_variants.is_not(None))
-    products = session.execute(stmt).scalars().all()
-    for product in products:
-        if product.upc_variants and upc in product.upc_variants:
-            return MatchResult(product=product, confidence=1.0, method=MatchMethod.UPC)
+    dialect_name = session.bind.dialect.name if session.bind else "default"
+    if dialect_name == "postgresql":
+        stmt = select(NormalizedProduct).where(
+            cast(NormalizedProduct.upc_variants, JSONB).op("@>")(
+                func.cast(json.dumps([upc]), JSONB)
+            )
+        )
+    else:
+        stmt = select(NormalizedProduct).where(
+            NormalizedProduct.upc_variants.is_not(None),
+            cast(NormalizedProduct.upc_variants, String).contains(upc),
+        )
+    product = session.execute(stmt).scalars().first()
+    if product:
+        return MatchResult(product=product, confidence=1.0, method=MatchMethod.UPC)
     return None
 
 

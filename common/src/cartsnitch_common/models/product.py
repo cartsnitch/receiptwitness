@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from sqlalchemy import JSON, String
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from cartsnitch_common.constants import ProductCategory, SizeUnit
@@ -26,7 +27,9 @@ class NormalizedProduct(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     brand: Mapped[str | None] = mapped_column(String(200))
     size: Mapped[str | None] = mapped_column(String(50))
     size_unit: Mapped[SizeUnit | None] = mapped_column(String(10))
-    upc_variants: Mapped[list[str] | None] = mapped_column(JSON, default=list)
+    upc_variants: Mapped[list[str] | None] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql"), default=list
+    )
 
     # Relationships
     purchase_items: Mapped[list["PurchaseItem"]] = relationship(back_populates="normalized_product")
