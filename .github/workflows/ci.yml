@@ -166,6 +166,8 @@ jobs:
       - name: Scan frontend image for vulnerabilities
         uses: anchore/scan-action@v5
         id: scan
+        env:
+          GRYPE_CONFIG: .grype.yaml
         with:
           image: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
@@ -263,6 +265,8 @@ jobs:
       - name: Scan auth image for vulnerabilities
         uses: anchore/scan-action@v5
         id: scan
+        env:
+          GRYPE_CONFIG: .grype.yaml
         with:
           image: "${{ env.REGISTRY }}/${{ env.AUTH_IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
@@ -343,12 +347,16 @@ jobs:
           load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APT_CACHE_BUST=${{ github.run_id }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Scan receiptwitness image for vulnerabilities
         uses: anchore/scan-action@v5
         id: scan
+        env:
+          GRYPE_CONFIG: .grype.yaml
         with:
           image: "${{ env.REGISTRY }}/${{ env.RECEIPTWITNESS_IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
@@ -371,6 +379,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APT_CACHE_BUST=${{ github.run_id }}
           cache-from: type=gha
 
   build-and-push-api:
@@ -429,12 +439,16 @@ jobs:
           load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APT_CACHE_BUST=${{ github.run_id }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Scan api image for vulnerabilities
         uses: anchore/scan-action@v5
         id: scan
+        env:
+          GRYPE_CONFIG: .grype.yaml
         with:
           image: "${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
@@ -457,6 +471,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APT_CACHE_BUST=${{ github.run_id }}
           cache-from: type=gha
 
   deploy-dev:

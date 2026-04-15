@@ -1,5 +1,6 @@
 FROM python:3.12-slim AS build
 
+ARG APT_CACHE_BUST=0
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     libpq-dev \
     build-essential \
@@ -12,6 +13,7 @@ RUN pip install --no-cache-dir --prefix=/install .
 
 FROM python:3.12-slim AS prod
 
+ARG APT_CACHE_BUST=0
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends libpq5 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

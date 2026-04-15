@@ -1,0 +1,4 @@
+ignore:
+  # Python 3.12 CVEs — only fixed in 3.13+, cannot upgrade major version safely
+  - vulnerability: CVE-2025-13836
+  - vulnerability: CVE-2026-4519
