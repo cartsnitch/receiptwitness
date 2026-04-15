@@ -170,6 +170,7 @@ jobs:
           image: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
           severity-cutoff: high
+          only-fixed: "true"
           output-format: sarif
 
       - name: Upload frontend scan results to GitHub Security
@@ -266,6 +267,7 @@ jobs:
           image: "${{ env.REGISTRY }}/${{ env.AUTH_IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
           severity-cutoff: high
+          only-fixed: "true"
           output-format: sarif
 
       - name: Upload auth scan results to GitHub Security
@@ -351,6 +353,7 @@ jobs:
           image: "${{ env.REGISTRY }}/${{ env.RECEIPTWITNESS_IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
           severity-cutoff: high
+          only-fixed: "true"
           output-format: sarif
 
       - name: Upload receiptwitness scan results to GitHub Security
@@ -436,6 +439,7 @@ jobs:
           image: "${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:sha-${{ github.sha }}"
           fail-build: true
           severity-cutoff: high
+          only-fixed: "true"
           output-format: sarif
 
       - name: Upload api scan results to GitHub Security
