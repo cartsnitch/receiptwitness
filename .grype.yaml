@@ -2,3 +2,107 @@ ignore:
   # Python 3.12 CVEs — only fixed in 3.13+, cannot upgrade major version safely
   - vulnerability: CVE-2025-13836
   - vulnerability: CVE-2026-4519
+
+  # Chrome CVEs — Playwright bundles Chromium and controls version separately.
+  # Chrome is not a system package that can be upgraded via apt-get upgrade.
+  # These CVEs are specific to the Chromium version bundled with Playwright.
+  # Upstream fix: upgrade Playwright to a version that includes patched Chrome.
+  - vulnerability: CVE-2026-2313
+  - vulnerability: CVE-2026-2314
+  - vulnerability: CVE-2026-2315
+  - vulnerability: CVE-2026-2319
+  - vulnerability: CVE-2026-2321
+  - vulnerability: CVE-2026-2441
+  - vulnerability: CVE-2026-2648
+  - vulnerability: CVE-2026-2649
+  - vulnerability: CVE-2026-2650
+  - vulnerability: CVE-2026-3061
+  - vulnerability: CVE-2026-3062
+  - vulnerability: CVE-2026-3536
+  - vulnerability: CVE-2026-3537
+  - vulnerability: CVE-2026-3538
+  - vulnerability: CVE-2026-3539
+  - vulnerability: CVE-2026-3540
+  - vulnerability: CVE-2026-3541
+  - vulnerability: CVE-2026-3542
+  - vulnerability: CVE-2026-3543
+  - vulnerability: CVE-2026-3544
+  - vulnerability: CVE-2026-3545
+  - vulnerability: CVE-2026-3913
+  - vulnerability: CVE-2026-3914
+  - vulnerability: CVE-2026-3915
+  - vulnerability: CVE-2026-3916
+  - vulnerability: CVE-2026-3917
+  - vulnerability: CVE-2026-3918
+  - vulnerability: CVE-2026-3919
+  - vulnerability: CVE-2026-3920
+  - vulnerability: CVE-2026-3921
+  - vulnerability: CVE-2026-3922
+  - vulnerability: CVE-2026-3923
+  - vulnerability: CVE-2026-3924
+  - vulnerability: CVE-2026-3926
+  - vulnerability: CVE-2026-3931
+  - vulnerability: CVE-2026-3932
+  - vulnerability: CVE-2026-3936
+  - vulnerability: CVE-2026-5858
+  - vulnerability: CVE-2026-5859
+  - vulnerability: CVE-2026-5860
+  - vulnerability: CVE-2026-5861
+  - vulnerability: CVE-2026-5862
+  - vulnerability: CVE-2026-5863
+  - vulnerability: CVE-2026-5865
+  - vulnerability: CVE-2026-5866
+  - vulnerability: CVE-2026-5868
+  - vulnerability: CVE-2026-5870
+  - vulnerability: CVE-2026-5871
+  - vulnerability: CVE-2026-5872
+  - vulnerability: CVE-2026-5873
+  - vulnerability: CVE-2026-5874
+  - vulnerability: CVE-2026-5877
+  - vulnerability: CVE-2026-5879
+  - vulnerability: CVE-2026-5883
+  - vulnerability: CVE-2026-5884
+  - vulnerability: CVE-2026-5902
+  - vulnerability: CVE-2026-5904
+  - vulnerability: CVE-2026-5907
+  - vulnerability: CVE-2026-5908
+  - vulnerability: CVE-2026-5909
+  - vulnerability: CVE-2026-5910
+  - vulnerability: CVE-2026-5912
+  - vulnerability: CVE-2026-5913
+  - vulnerability: CVE-2026-5914
+  - vulnerability: CVE-2026-5915
+  - vulnerability: CVE-2026-6296
+  - vulnerability: CVE-2026-6297
+  - vulnerability: CVE-2026-6299
+  - vulnerability: CVE-2026-6300
+  - vulnerability: CVE-2026-6301
+  - vulnerability: CVE-2026-6302
+  - vulnerability: CVE-2026-6303
+  - vulnerability: CVE-2026-6304
+  - vulnerability: CVE-2026-6305
+  - vulnerability: CVE-2026-6306
+  - vulnerability: CVE-2026-6307
+  - vulnerability: CVE-2026-6308
+  - vulnerability: CVE-2026-6309
+  - vulnerability: CVE-2026-6310
+  - vulnerability: CVE-2026-6311
+  - vulnerability: CVE-2026-6314
+  - vulnerability: CVE-2026-6315
+  - vulnerability: CVE-2026-6316
+  - vulnerability: CVE-2026-6317
+  - vulnerability: CVE-2026-6318
+  - vulnerability: CVE-2026-6319
+  - vulnerability: CVE-2026-6358
+  - vulnerability: CVE-2026-6359
+  - vulnerability: CVE-2026-6360
+  - vulnerability: CVE-2026-6361
+  - vulnerability: CVE-2026-6363
+
+  # Node.js CVE — comes from Playwright's bundled tooling (playwright-core uses Node.js
+  # for its CLI). The system Node.js is not used by receiptwitness service.
+  # Fix requires upgrading Playwright to a version that ships with patched Node.js.
+  - vulnerability: CVE-2026-21710
+
+  # cryptography GHSA — fixed by upgrading to >=46.0 per requirements
+  - vulnerability: GHSA-r6ph-v2qm-q3c2
