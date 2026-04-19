@@ -3,8 +3,6 @@
 import uuid
 from datetime import UTC, datetime
 
-from receiptwitness.shared.models import NormalizedProduct
-
 from receiptwitness.pipeline.normalization import (
     MatchMethod,
     clean_name,
@@ -14,6 +12,7 @@ from receiptwitness.pipeline.normalization import (
     match_by_upc,
     normalize_product,
 )
+from receiptwitness.shared.models import NormalizedProduct
 
 
 class TestCleanName:

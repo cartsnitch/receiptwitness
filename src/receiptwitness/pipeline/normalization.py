@@ -10,10 +10,11 @@ import re
 from dataclasses import dataclass
 from enum import StrEnum
 
-from receiptwitness.shared.models import NormalizedProduct
-from sqlalchemy import cast, func, select, String
+from sqlalchemy import String, cast, func, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
+
+from receiptwitness.shared.models import NormalizedProduct
 
 
 class MatchMethod(StrEnum):

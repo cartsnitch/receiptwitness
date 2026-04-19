@@ -1,9 +1,10 @@
 """Shared test fixtures for pipeline tests."""
 
 import pytest
-from receiptwitness.shared.models import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from receiptwitness.shared.models import Base
 
 
 @pytest.fixture
