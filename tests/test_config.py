@@ -1,4 +1,5 @@
 import pytest
+
 from receiptwitness.config import ReceiptWitnessSettings
 
 
