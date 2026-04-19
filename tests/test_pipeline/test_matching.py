@@ -4,9 +4,9 @@ import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from cartsnitch_common.constants import MatchConfidence
-from cartsnitch_common.models.product import NormalizedProduct
-from cartsnitch_common.schemas.purchase import PurchaseItemCreate
+from receiptwitness.shared.constants import MatchConfidence
+from receiptwitness.shared.models import NormalizedProduct
+from receiptwitness.shared.schemas import PurchaseItemCreate
 
 from receiptwitness.pipeline.matching import (
     ProductMatcher,

@@ -3,7 +3,7 @@
 import uuid
 from datetime import UTC, datetime
 
-from cartsnitch_common.models.product import NormalizedProduct
+from receiptwitness.shared.models import NormalizedProduct
 
 from receiptwitness.pipeline.normalization import (
     MatchMethod,

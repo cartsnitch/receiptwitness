@@ -7,9 +7,9 @@ and batch matching for purchase ingestion.
 import uuid
 from dataclasses import dataclass
 
-from cartsnitch_common.constants import MatchConfidence
-from cartsnitch_common.models.product import NormalizedProduct
-from cartsnitch_common.schemas.purchase import PurchaseItemCreate
+from receiptwitness.shared.constants import MatchConfidence
+from receiptwitness.shared.models import NormalizedProduct
+from receiptwitness.shared.schemas import PurchaseItemCreate
 from sqlalchemy.orm import Session
 
 from receiptwitness.pipeline.normalization import (

@@ -7,8 +7,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import redis.asyncio as aioredis
-from cartsnitch_common.database import get_async_session_factory
-from cartsnitch_common.models.user import User
+from receiptwitness.shared.database import get_async_session_factory
+from receiptwitness.shared.models import User
 from sqlalchemy import select
 
 from receiptwitness.config import settings

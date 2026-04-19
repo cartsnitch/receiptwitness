@@ -10,7 +10,7 @@ import re
 from dataclasses import dataclass
 from enum import StrEnum
 
-from cartsnitch_common.models.product import NormalizedProduct
+from receiptwitness.shared.models import NormalizedProduct
 from sqlalchemy import cast, func, select, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session

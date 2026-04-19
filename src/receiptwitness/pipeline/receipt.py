@@ -7,7 +7,7 @@ import re
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
-from cartsnitch_common.schemas.purchase import PurchaseCreate, PurchaseItemCreate
+from receiptwitness.shared.schemas import PurchaseCreate, PurchaseItemCreate
 
 
 def _clean_product_name(raw: str) -> str:

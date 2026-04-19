@@ -1,7 +1,7 @@
 """Shared test fixtures for pipeline tests."""
 
 import pytest
-from cartsnitch_common.models.base import Base
+from receiptwitness.shared.models import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

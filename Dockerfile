@@ -3,22 +3,18 @@ FROM python:3.12-slim AS build
 
 WORKDIR /app
 
-# build-essential and libpq-dev are needed to compile any C-extension wheels
-# (e.g. psycopg2 fallback).  No git needed — common/ is copied from the repo root.
 ARG APT_CACHE_BUST=1
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     libpq-dev \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Build context is the repo root.  These paths are relative to the root.
-COPY receiptwitness/pyproject.toml ./
-COPY receiptwitness/src/ ./src/
-COPY common/ ./common/
+# Build context is the receiptwitness repo root.
+COPY pyproject.toml ./
+COPY src/ ./src/
 
-# Install from the local common/ (cartsnitch-common>=0.1.0 in pyproject.toml
-# will be satisfied by the local package) then install receiptwitness itself.
-RUN pip install --no-cache-dir --prefix=/install ./common/ .
+# Install receiptwitness (shared modules are inlined under src/receiptwitness/shared/).
+RUN pip install --no-cache-dir --prefix=/install .
 
 # Stage 2: Production image with Playwright + Chromium
 FROM python:3.12-slim AS prod
@@ -50,7 +46,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 RUN adduser --system --group --uid 1000 app
 
 COPY --from=build /install /usr/local
-COPY receiptwitness/src/ ./src/
+COPY src/ ./src/
+COPY alembic.ini ./
+COPY alembic/ ./alembic/
 
 # Install Playwright Chromium browser (runs as root; /opt/playwright is world-readable)
 RUN PLAYWRIGHT_BROWSERS_PATH=/opt/playwright playwright install chromium
@@ -63,4 +61,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
 
-CMD ["uvicorn", "receiptwitness.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "python -m alembic upgrade head && uvicorn receiptwitness.main:app --host 0.0.0.0 --port 8000"]

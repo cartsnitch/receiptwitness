@@ -11,7 +11,7 @@ CartSnitch is a self-hosted grocery price intelligence platform built as a polyr
 
 | Repo | Service | Purpose |
 |------|---------|---------|
-| `cartsnitch/common` | — | Shared models, schemas, utilities |
+| `cartsnitch/common` | — | Shared models, schemas, utilities (extracted into individual service repos) |
 | `cartsnitch/receiptwitness` | ReceiptWitness | Purchase data ingestion via retailer scrapers (this repo) |
 | `cartsnitch/api` | API Gateway | Frontend-facing REST API |
 | `cartsnitch/cartsnitch` | Frontend | React PWA (mobile-first) |
@@ -23,7 +23,7 @@ CartSnitch is a self-hosted grocery price intelligence platform built as a polyr
 ### Architecture Decisions
 
 - **Polyrepo:** Each service has its own repo, Dockerfile, CI/CD pipeline.
-- **Shared DB:** One PostgreSQL cluster. This service writes to `purchases`, `purchase_items`, `price_history` tables. Models come from `cartsnitch-common`.
+- **Shared DB:** One PostgreSQL cluster. This service writes to `purchases`, `purchase_items`, `price_history` tables. Models are inlined under `src/receiptwitness/shared/` (extracted from `cartsnitch-common` during the CAR-724 migration).
 - **Inter-service comms:** REST (synchronous) + Redis pub/sub (async events).
 - **Target scale:** 500–1,000 users. Each user has their own authenticated sessions to up to 3 retailers.
 
@@ -60,7 +60,7 @@ ReceiptWitness authenticates with grocery retailer web portals using per-user se
 - Python 3.12+
 - Playwright (Python async API) for headless browser automation
 - FastAPI (lightweight internal API for triggering scrapes, health checks, status)
-- SQLAlchemy 2.0 (via `cartsnitch-common`)
+- SQLAlchemy 2.0 (models inlined under `src/receiptwitness/shared/`)
 - Redis (pub/sub event publishing)
 - APScheduler or Celery (for scheduled scraping jobs)
 - cryptography / Fernet (encrypting stored session data)
