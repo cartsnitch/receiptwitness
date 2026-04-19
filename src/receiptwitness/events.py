@@ -7,12 +7,12 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import redis.asyncio as aioredis
-from receiptwitness.shared.database import get_async_session_factory
-from receiptwitness.shared.models import User
 from sqlalchemy import select
 
 from receiptwitness.config import settings
 from receiptwitness.notifications.email import send_receipt_notification
+from receiptwitness.shared.database import get_async_session_factory
+from receiptwitness.shared.models import User
 
 logger = logging.getLogger(__name__)
 
