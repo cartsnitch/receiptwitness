@@ -1,0 +1,131 @@
+{
+  "orderId": "KR-2026-0312-4471",
+  "purchaseDate": "2026-03-12T16:45:00Z",
+  "storeNumber": "00357",
+  "divisionNumber": "014",
+  "total": 94.17,
+  "savings": 15.30,
+  "detail": {
+    "receiptId": "KR-2026-0312-4471",
+    "items": [
+      {
+        "description": "KROGER WHOLE MILK GAL",
+        "upc": "0001111041700",
+        "quantity": 1,
+        "basePrice": 3.99,
+        "totalPrice": 3.99,
+        "regularPrice": 4.29,
+        "salePrice": 3.99,
+        "couponAmount": 0.0,
+        "plusCardSavings": 0.30,
+        "department": "DAIRY"
+      },
+      {
+        "description": "BANANAS",
+        "upc": "0000000004011",
+        "quantity": 1,
+        "basePrice": 0.59,
+        "totalPrice": 0.59,
+        "regularPrice": 0.59,
+        "salePrice": null,
+        "couponAmount": null,
+        "plusCardSavings": null,
+        "department": "PRODUCE"
+      },
+      {
+        "description": "SIMPLE TRUTH ORG EGGS 12CT",
+        "upc": "0001111087840",
+        "quantity": 2,
+        "basePrice": 5.49,
+        "totalPrice": 10.98,
+        "regularPrice": 5.99,
+        "salePrice": 5.49,
+        "couponAmount": 0.0,
+        "plusCardSavings": 1.00,
+        "department": "DAIRY"
+      },
+      {
+        "description": "KROGER DELI TURKEY BREAST",
+        "upc": null,
+        "quantity": 0.68,
+        "basePrice": 9.99,
+        "totalPrice": 6.79,
+        "regularPrice": 9.99,
+        "salePrice": null,
+        "weight": 0.68,
+        "weightUom": "LB",
+        "department": "DELI"
+      },
+      {
+        "description": "TIDE PODS 42CT",
+        "upc": "0003700096223",
+        "quantity": 1,
+        "basePrice": 13.99,
+        "totalPrice": 13.99,
+        "regularPrice": 15.99,
+        "salePrice": 13.99,
+        "couponAmount": 2.00,
+        "plusCardSavings": 0.0,
+        "department": "HOUSEHOLD"
+      },
+      {
+        "description": "VOIDED DORITOS NACHO",
+        "upc": "0002840032505",
+        "quantity": 1,
+        "basePrice": 4.79,
+        "totalPrice": 4.79,
+        "voided": true,
+        "department": "SNACKS"
+      },
+      {
+        "description": "RETURNED GATORADE 8PK",
+        "upc": "0005200012505",
+        "quantity": 1,
+        "basePrice": 7.99,
+        "totalPrice": 7.99,
+        "status": "RETURNED",
+        "department": "BEVERAGES"
+      },
+      {
+        "description": "KROGER SHARP CHEDDAR 8OZ",
+        "upc": "0001111060930",
+        "quantity": 1,
+        "basePrice": 3.49,
+        "totalPrice": 3.49,
+        "regularPrice": 3.49,
+        "salePrice": null,
+        "couponAmount": null,
+        "plusCardSavings": null,
+        "department": "DAIRY"
+      },
+      {
+        "description": "PRIVATE SELECTION PASTA",
+        "upc": "0001111085612",
+        "quantity": 3,
+        "basePrice": 2.49,
+        "totalPrice": 7.47,
+        "regularPrice": 2.99,
+        "salePrice": 2.49,
+        "couponAmount": 0.0,
+        "plusCardSavings": 1.50,
+        "department": "GROCERY"
+      },
+      {
+        "description": "KROGER GROUND BEEF 80/20",
+        "upc": null,
+        "quantity": 1.23,
+        "basePrice": 5.99,
+        "totalPrice": 7.37,
+        "regularPrice": 6.99,
+        "salePrice": 5.99,
+        "weight": 1.23,
+        "weightUom": "LB",
+        "department": "MEAT"
+      }
+    ],
+    "subtotal": 78.47,
+    "tax": 5.50,
+    "total": 94.17,
+    "totalSavings": 15.30
+  }
+}

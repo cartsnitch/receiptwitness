@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+.venv/
+.env
+.git/
+.github/
+tests/
+*.md
+renovate.json
