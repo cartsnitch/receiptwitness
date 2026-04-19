@@ -7,9 +7,6 @@ and batch matching for purchase ingestion.
 import uuid
 from dataclasses import dataclass
 
-from receiptwitness.shared.constants import MatchConfidence
-from receiptwitness.shared.models import NormalizedProduct
-from receiptwitness.shared.schemas import PurchaseItemCreate
 from sqlalchemy.orm import Session
 
 from receiptwitness.pipeline.normalization import (
@@ -18,6 +15,9 @@ from receiptwitness.pipeline.normalization import (
     extract_size_info,
     normalize_product,
 )
+from receiptwitness.shared.constants import MatchConfidence
+from receiptwitness.shared.models import NormalizedProduct
+from receiptwitness.shared.schemas import PurchaseItemCreate
 
 # Re-export for convenience
 ConfidenceLevel = MatchConfidence

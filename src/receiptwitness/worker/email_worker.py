@@ -3,8 +3,6 @@
 import asyncio
 import logging
 
-from receiptwitness.shared.database import get_async_session_factory
-from receiptwitness.shared.models import User
 from sqlalchemy import select
 
 from receiptwitness.config import settings
@@ -15,6 +13,8 @@ from receiptwitness.parsers.email.kroger import KrogerEmailParser
 from receiptwitness.parsers.email.meijer import MeijerEmailParser
 from receiptwitness.parsers.email.target import TargetEmailParser
 from receiptwitness.queue.email import ack_email, consume_emails, get_redis
+from receiptwitness.shared.database import get_async_session_factory
+from receiptwitness.shared.models import User
 
 logger = logging.getLogger(__name__)
 

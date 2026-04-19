@@ -4,16 +4,15 @@ import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from receiptwitness.shared.constants import MatchConfidence
-from receiptwitness.shared.models import NormalizedProduct
-from receiptwitness.shared.schemas import PurchaseItemCreate
-
 from receiptwitness.pipeline.matching import (
     ProductMatcher,
     classify_confidence,
     match_purchase_item,
 )
 from receiptwitness.pipeline.normalization import MatchMethod
+from receiptwitness.shared.constants import MatchConfidence
+from receiptwitness.shared.models import NormalizedProduct
+from receiptwitness.shared.schemas import PurchaseItemCreate
 
 
 class TestClassifyConfidence:
