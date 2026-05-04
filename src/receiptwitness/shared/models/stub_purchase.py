@@ -9,6 +9,8 @@ import uuid
 from datetime import date, datetime
 from decimal import Decimal
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import (
     JSON,
     Date,
@@ -20,9 +22,12 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from receiptwitness.shared.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from receiptwitness.shared.models.user import User
 
 
 class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -51,6 +56,8 @@ class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         Index("ix_purchases_user_store", "user_id", "store_id"),
         UniqueConstraint("user_id", "store_id", "receipt_id", name="uq_purchase_receipt"),
     )
+
+    user: Mapped["User"] = relationship(back_populates="purchases")
 
 
 class PurchaseItem(UUIDPrimaryKeyMixin, TimestampMixin, Base):
