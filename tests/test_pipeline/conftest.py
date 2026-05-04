@@ -25,6 +25,7 @@ def _populate_email_inbound_token(mapper, connection, target):
 def engine():
     """In-memory SQLite engine for unit tests."""
     eng = create_engine("sqlite:///:memory:")
+    User.__table__.c.email_inbound_token.server_default = None
     Base.metadata.create_all(eng)
     yield eng
     eng.dispose()
