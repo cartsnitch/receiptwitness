@@ -6,7 +6,6 @@ UserStoreAccount. The canonical definitions live in cartsnitch/common.
 """
 
 import uuid
-
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Float, ForeignKey, String

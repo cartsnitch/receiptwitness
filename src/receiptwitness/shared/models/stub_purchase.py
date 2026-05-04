@@ -8,7 +8,6 @@ UserStoreAccount. The canonical definitions live in cartsnitch/common.
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
-
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
