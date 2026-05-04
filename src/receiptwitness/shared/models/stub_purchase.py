@@ -8,7 +8,6 @@ UserStoreAccount. The canonical definitions live in cartsnitch/common.
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     JSON,
@@ -21,12 +20,9 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from receiptwitness.shared.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-
-if TYPE_CHECKING:
-    from receiptwitness.shared.models.user import User
 
 
 class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -50,9 +46,6 @@ class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         server_default=func.now(),
         nullable=False,
     )
-
-    # Relationships (stubs — canonical definitions in cartsnitch/common)
-    user: Mapped["User"] = relationship(back_populates="purchases")
 
     __table_args__ = (
         Index("ix_purchases_user_store", "user_id", "store_id"),

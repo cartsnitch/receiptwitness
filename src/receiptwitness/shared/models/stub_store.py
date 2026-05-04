@@ -6,16 +6,12 @@ UserStoreAccount. The canonical definitions live in cartsnitch/common.
 """
 
 import uuid
-from typing import TYPE_CHECKING
 
 from sqlalchemy import Float, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from receiptwitness.shared.constants import StoreSlug
 from receiptwitness.shared.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-
-if TYPE_CHECKING:
-    from receiptwitness.shared.models.user import UserStoreAccount
 
 
 class Store(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -27,9 +23,6 @@ class Store(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     slug: Mapped[StoreSlug] = mapped_column(String(20), nullable=False, unique=True)
     logo_url: Mapped[str | None] = mapped_column(String(500))
     website_url: Mapped[str | None] = mapped_column(String(500))
-
-    # Relationships (stubs — canonical definitions in cartsnitch/common)
-    user_accounts: Mapped[list["UserStoreAccount"]] = relationship(back_populates="store")
 
 
 class StoreLocation(UUIDPrimaryKeyMixin, TimestampMixin, Base):
