@@ -28,7 +28,6 @@ class Store(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     logo_url: Mapped[str | None] = mapped_column(String(500))
     website_url: Mapped[str | None] = mapped_column(String(500))
 
-    # Relationships (stubs — canonical definitions in cartsnitch/common)
     user_accounts: Mapped[list["UserStoreAccount"]] = relationship(back_populates="store")
 
 

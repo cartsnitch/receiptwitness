@@ -51,13 +51,12 @@ class Purchase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
     )
 
-    # Relationships (stubs — canonical definitions in cartsnitch/common)
-    user: Mapped["User"] = relationship(back_populates="purchases")
-
     __table_args__ = (
         Index("ix_purchases_user_store", "user_id", "store_id"),
         UniqueConstraint("user_id", "store_id", "receipt_id", name="uq_purchase_receipt"),
     )
+
+    user: Mapped["User"] = relationship(back_populates="purchases")
 
 
 class PurchaseItem(UUIDPrimaryKeyMixin, TimestampMixin, Base):

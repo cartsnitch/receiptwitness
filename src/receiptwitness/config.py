@@ -39,8 +39,8 @@ class ReceiptWitnessSettings(BaseSettings):
         if not self.session_encryption_key or self.session_encryption_key in _PLACEHOLDER_VALUES:
             errors.append(
                 "RW_SESSION_ENCRYPTION_KEY must be set to a secure value. "
-                "Generate one with: python -c \"from cryptography.fernet import Fernet; "
-                'print(Fernet.generate_key().decode())"'
+                "Generate one with: python -c "
+                '"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"'
             )
         if self.notifications_enabled and not self.resend_api_key:
             errors.append(
